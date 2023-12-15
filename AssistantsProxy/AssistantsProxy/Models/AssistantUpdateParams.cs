@@ -2,7 +2,7 @@
 
 namespace AssistantsProxy.Models
 {
-    public class CreateAssistant
+    public class AssistantUpdateParams
     {
         [JsonPropertyName("name")]
         public string? Name { get; set; }

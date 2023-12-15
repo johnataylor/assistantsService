@@ -2,7 +2,7 @@
 
 namespace AssistantsProxy.Models
 {
-    public class RunRequest
+    public class RunCreateParams
     {
         [JsonPropertyName("assistant_id")]
         public string? AsdsistantId { get; set; }

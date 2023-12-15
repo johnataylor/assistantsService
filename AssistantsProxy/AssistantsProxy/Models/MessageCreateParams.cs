@@ -2,7 +2,7 @@
 
 namespace AssistantsProxy.Models
 {
-    public class CreateMessage
+    public class MessageCreateParams
     {
         [JsonPropertyName("role")]
         public string? Role { get; set; }
