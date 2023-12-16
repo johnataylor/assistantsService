@@ -4,15 +4,12 @@ using System.Text.Json;
 
 namespace AssistantsProxy.Controllers
 {
-    [Route("v1/assistants")]
     [ApiController]
-    [Produces("application/json")]
-    public class AssistantsController : ControllerBase
+    public class AssistantsController : AssistantsControllerBase
     {
         private string _baseUri = "https://api.openai.com";
 
-        [HttpPost]
-        public async Task<Assistant?> Create(AssistantCreateParams assistantCreateParams)
+        protected override async Task<Assistant?> CreateImplementationAsync(AssistantCreateParams assistantCreateParams)
         {
             var inboundContent = JsonSerializer.Serialize(assistantCreateParams);
             var (inboundContentType, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
@@ -27,8 +24,7 @@ namespace AssistantsProxy.Controllers
             return assistant;
         }
 
-        [HttpGet]
-        public async Task<AssistantList<Assistant>?> List()
+        protected override async Task<AssistantList<Assistant>?> ListImplementationAsync()
         {
             var (_, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
             var requestUri = _baseUri + Request.Path;
@@ -42,8 +38,7 @@ namespace AssistantsProxy.Controllers
             return assistant;
         }
 
-        [HttpGet("{assistantId}")]
-        public async Task<Assistant?> Retrieve(string assistantId)
+        protected override async Task<Assistant?> RetrieveImplementationAsync(string assistantId)
         {
             var (_, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
             var requestUri = _baseUri + Request.Path;
@@ -57,8 +52,7 @@ namespace AssistantsProxy.Controllers
             return assistant;
         }
 
-        [HttpPost("{assistantId}")]
-        public async Task<Assistant?> Update(string assistantId, AssistantUpdateParams assistantUpdateParams)
+        protected override async Task<Assistant?> UpdateImplementationAsync(string assistantId, AssistantUpdateParams assistantUpdateParams)
         {
             var inboundContent = JsonSerializer.Serialize(assistantUpdateParams);
 
@@ -74,8 +68,7 @@ namespace AssistantsProxy.Controllers
             return assistant;
         }
 
-        [HttpDelete("{assistantId}")]
-        public async Task Delete(string assistantId)
+        protected override async Task DeleteImplementationAsync(string assistantId)
         {
             var (_, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
             var requestUri = _baseUri + Request.Path;
