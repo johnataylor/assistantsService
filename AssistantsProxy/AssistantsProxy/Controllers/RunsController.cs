@@ -1,76 +1,42 @@
 ﻿using AssistantsProxy.Models;
+using AssistantsProxy.Schema;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace AssistantsProxy.Controllers
 {
     [Route("/v1/threads/{threadId}/runs")]
-    [ApiController]
-    public class RunsController : ControllerBase
+    public class RunsController : AssistantsControllerBase
     {
-        private string _baseUri = "https://api.openai.com";
+        private readonly IRunsModel _model;
+
+        public RunsController(IRunsModel model)
+        {
+            _model = model;
+        }
 
         [HttpPost]
-        public async Task<ThreadRun?> Create([FromRoute]string threadId, RunCreateParams runCreateParams)
+        public Task<ThreadRun?> CreateAsync([FromRoute]string threadId, RunCreateParams runCreateParams)
         { 
-            var inboundContent = JsonSerializer.Serialize(runCreateParams);
-            var (inboundContentType, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(requestUri, inboundContent, inboundContentType, openAiBeta, bearerToken);
-
-            Response.StatusCode = statusCode;
-
-            var threadRun = JsonSerializer.Deserialize<ThreadRun>(content);
-
-            return threadRun;
+            return _model.CreateAsync(threadId, runCreateParams, BearerToken);
         }
 
         [HttpGet("{runId}")]
-        public async Task<ThreadRun?> Retrieve([FromRoute]string threadId, string runId)
+        public Task<ThreadRun?> RetrieveAsync([FromRoute]string threadId, string runId)
         {
-            var (_, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, contentType, content) = await HttpProxyHelpers.MakeGetRequest(requestUri, openAiBeta, bearerToken);
-
-            Response.StatusCode = statusCode;
-
-            var threadRun = JsonSerializer.Deserialize<ThreadRun>(content);
-
-            return threadRun;
+            return _model.RetrieveAsync(threadId, runId, BearerToken);
         }
 
         [HttpPost("{runId}")]
-        public async Task<ThreadRun?> Update([FromRoute]string threadId, string runId, RunUpdateParams runUpdateParams)
+        public Task<ThreadRun?> UpdateAsync([FromRoute]string threadId, string runId, RunUpdateParams runUpdateParams)
         {
-            var inboundContent = JsonSerializer.Serialize(runUpdateParams);
-            var (inboundContentType, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(requestUri, inboundContent, inboundContentType, openAiBeta, bearerToken);
-
-            Response.StatusCode = statusCode;
-
-            var threadRun = JsonSerializer.Deserialize<ThreadRun>(content);
-
-            return threadRun;
+            return _model.UpdateAsync(threadId, runId, runUpdateParams, BearerToken);
         }
 
         [HttpPost("{runId}/cancel")]
-        public async Task<ThreadRun?> Cancel([FromRoute]string threadId, string runId, RunCreateParams runCreateParams)
+        public Task<ThreadRun?> CancelAsync([FromRoute]string threadId, string runId)
         {
-            var inboundContent = JsonSerializer.Serialize(runCreateParams);
-            var (inboundContentType, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(requestUri, inboundContent, inboundContentType, openAiBeta, bearerToken);
-
-            Response.StatusCode = statusCode;
-
-            var threadRun = JsonSerializer.Deserialize<ThreadRun>(content);
-
-            return threadRun;
+            return _model.CancelAsync(threadId, runId, BearerToken);
         }
     }
 }

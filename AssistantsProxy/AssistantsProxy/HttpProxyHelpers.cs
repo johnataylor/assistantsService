@@ -21,12 +21,12 @@ namespace AssistantsProxy
             return (contentType, openAiBeta, bearerToken);
         }
 
-        public static async Task<(int statusCode, string content)> MakePostRequest(string requestUri, string content, string contentType, string? openAiBeta, string? bearerToken)
+        public static async Task<(int statusCode, string content)> MakePostRequest(string requestUri, string content, string? openAiBeta, string? bearerToken)
         {
             var client = new HttpClient();
             var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
             request.Content = new StringContent(content);
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
             request.Headers.Add("OpenAI-Beta", openAiBeta);
 

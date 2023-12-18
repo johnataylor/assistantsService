@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace AssistantsProxy.Models
+namespace AssistantsProxy.Schema
 {
-    public class AssistantCreateParams
+    public class AssistantUpdateParams
     {
         [JsonPropertyName("name")]
         public string? Name { get; set; }

@@ -1,77 +1,41 @@
 ﻿using AssistantsProxy.Models;
+using AssistantsProxy.Schema;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace AssistantsProxy.Controllers
 {
     [Route("/v1/threads/{threadId}/messages")]
-    [ApiController]
-    public class MessagesController : ControllerBase
+    public class MessagesController : AssistantsControllerBase
     {
-        private string _baseUri = "https://api.openai.com";
+        private readonly IMessagesModel _model;
+
+        public MessagesController(IMessagesModel model)
+        {
+            _model = model;
+        }
 
         [HttpPost]
-        public async Task<ThreadMessage?> Create([FromRoute]string threadId, MessageCreateParams messageCreateParams)
+        public Task<ThreadMessage?> CreateAsync([FromRoute]string threadId, MessageCreateParams messageCreateParams)
         {
-            var inboundContent = JsonSerializer.Serialize(messageCreateParams);
-
-            var (inboundContentType, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(requestUri, inboundContent, inboundContentType, openAiBeta, bearerToken);
-
-            Response.StatusCode = statusCode;
-            var threadMessage = JsonSerializer.Deserialize<ThreadMessage>(content);
-            return threadMessage;
+            return _model.CreateAsync(threadId, messageCreateParams, BearerToken);
         }
 
         [HttpGet("{messageId}")]
-        public async Task<ThreadMessage?> Retrieve([FromRoute]string threadId, string messageId)
+        public Task<ThreadMessage?> Retrieve([FromRoute]string threadId, string messageId)
         {
-            var (_, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, contentType, content) = await HttpProxyHelpers.MakeGetRequest(requestUri, openAiBeta, bearerToken);
-
-            Response.StatusCode = statusCode;
-
-            var threadMessage = JsonSerializer.Deserialize<ThreadMessage>(content);
-
-            Response.Headers.ContentType = contentType;
-
-            return threadMessage;
+            return _model.RetrieveAsync(threadId, messageId, BearerToken);
         }
 
         [HttpPost("{messageId}")]
-        public async Task<ThreadMessage?> Update([FromRoute] string threadId, string messageId, MessageUpdateParams messageUpdateParams)
+        public Task<ThreadMessage?> UpdateAsync([FromRoute] string threadId, string messageId, MessageUpdateParams messageUpdateParams)
         {
-            var inboundContent = JsonSerializer.Serialize(messageUpdateParams);
-
-            var (inboundContentType, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(requestUri, inboundContent, inboundContentType, openAiBeta, bearerToken);
-
-            Response.StatusCode = statusCode;
-            var threadMessage = JsonSerializer.Deserialize<ThreadMessage>(content);
-            return threadMessage;
+            return _model.UpdateAsync(threadId, messageId, messageUpdateParams, BearerToken);
         }
 
         [HttpGet]
-        public async Task<AssistantList<ThreadMessage>?> List([FromRoute]string threadId)
+        public Task<AssistantList<ThreadMessage>?> ListAsync([FromRoute]string threadId)
         {
-            var (_, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, contentType, content) = await HttpProxyHelpers.MakeGetRequest(requestUri, openAiBeta, bearerToken);
-
-            Response.StatusCode = statusCode;
-
-            var messageList = JsonSerializer.Deserialize<AssistantList<ThreadMessage>>(content);
-
-            Response.Headers.ContentType = contentType;
-
-            return messageList;
+            return _model.ListAsync(threadId, BearerToken);
         }
     }
 }

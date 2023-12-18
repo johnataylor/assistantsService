@@ -1,79 +1,47 @@
 ﻿using AssistantsProxy.Models;
+using AssistantsProxy.Schema;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace AssistantsProxy.Controllers
 {
-    [ApiController]
+    [Route("v1/assistants")]
     public class AssistantsController : AssistantsControllerBase
     {
-        private string _baseUri = "https://api.openai.com";
+        private readonly IAssistantsModel _model;
 
-        protected override async Task<Assistant?> CreateImplementationAsync(AssistantCreateParams assistantCreateParams)
+        public AssistantsController(IAssistantsModel model)
         {
-            var inboundContent = JsonSerializer.Serialize(assistantCreateParams);
-            var (inboundContentType, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(requestUri, inboundContent, inboundContentType, openAiBeta, bearerToken);
-
-            var assistant = JsonSerializer.Deserialize<Assistant>(content);
-
-            Response.StatusCode = statusCode;
-
-            return assistant;
+            _model = model;
         }
 
-        protected override async Task<AssistantList<Assistant>?> ListImplementationAsync()
+        [HttpPost]
+        public Task<Assistant?> CreateAsync(AssistantCreateParams assistantCreateParams)
         {
-            var (_, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, _, content) = await HttpProxyHelpers.MakeGetRequest(requestUri, openAiBeta, bearerToken);
-
-            var assistant = JsonSerializer.Deserialize<AssistantList<Assistant>>(content);
-
-            Response.StatusCode = statusCode;
-
-            return assistant;
+            return _model.CreateAsync(assistantCreateParams, BearerToken);
         }
 
-        protected override async Task<Assistant?> RetrieveImplementationAsync(string assistantId)
+        [HttpGet]
+        public Task<AssistantList<Assistant>?> ListAsync()
         {
-            var (_, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, _, content) = await HttpProxyHelpers.MakeGetRequest(requestUri, openAiBeta, bearerToken);
-
-            var assistant = JsonSerializer.Deserialize<Assistant>(content);
-
-            Response.StatusCode = statusCode;
-
-            return assistant;
+            return _model.ListAsync(BearerToken);
         }
 
-        protected override async Task<Assistant?> UpdateImplementationAsync(string assistantId, AssistantUpdateParams assistantUpdateParams)
+        [HttpGet("{assistantId}")]
+        public Task<Assistant?> RetrieveAsync(string assistantId)
         {
-            var inboundContent = JsonSerializer.Serialize(assistantUpdateParams);
-
-            var (inboundContentType, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
-
-            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(requestUri, inboundContent, inboundContentType, openAiBeta, bearerToken);
-
-            var assistant = JsonSerializer.Deserialize<Assistant>(content);
-
-            Response.StatusCode = statusCode;
-
-            return assistant;
+            return _model.RetrieveAsync(assistantId, BearerToken);
         }
 
-        protected override async Task DeleteImplementationAsync(string assistantId)
+        [HttpPost("{assistantId}")]
+        public Task<Assistant?> UpdateAsync(string assistantId, AssistantUpdateParams assistantUpdateParams)
         {
-            var (_, openAiBeta, bearerToken) = HttpProxyHelpers.ReadHeaders(Request);
-            var requestUri = _baseUri + Request.Path;
+            return _model.UpdateAsync(assistantId, assistantUpdateParams, BearerToken);
+        }
 
-            var statusCode = await HttpProxyHelpers.MakeDeleteRequest(requestUri, openAiBeta, bearerToken);
+        [HttpDelete("{assistantId}")]
+        public Task DeleteAsync(string assistantId)
+        {
+            return _model.DeleteAsync(assistantId, BearerToken);
         }
     }
 }

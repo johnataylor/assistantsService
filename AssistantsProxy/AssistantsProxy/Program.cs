@@ -1,3 +1,4 @@
+using AssistantsProxy.Models;
 using Microsoft.AspNetCore.Diagnostics;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -9,6 +10,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IAssistantsModel, AssistantsModel>();
+builder.Services.AddScoped<IThreadsModel, ThreadsModel>();
+builder.Services.AddScoped<IMessagesModel, MessagesModel>();
+builder.Services.AddScoped<IRunsModel, RunsModel>();
 
 var app = builder.Build();
 

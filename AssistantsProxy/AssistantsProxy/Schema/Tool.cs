@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace AssistantsProxy.Models
+namespace AssistantsProxy.Schema
 {
     public class Tool
     {
