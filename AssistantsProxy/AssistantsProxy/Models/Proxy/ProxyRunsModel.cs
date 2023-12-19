@@ -1,9 +1,9 @@
 ﻿using AssistantsProxy.Schema;
 using System.Text.Json;
 
-namespace AssistantsProxy.Models
+namespace AssistantsProxy.Models.Proxy
 {
-    public class RunsModel : IRunsModel
+    public class ProxyRunsModel : IRunsModel
     {
         public async Task<ThreadRun?> CreateAsync(string threadId, RunCreateParams runCreateParams, string? bearerToken)
         {
