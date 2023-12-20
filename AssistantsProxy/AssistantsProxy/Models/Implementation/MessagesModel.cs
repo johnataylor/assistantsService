@@ -1,6 +1,5 @@
 ﻿using AssistantsProxy.Schema;
 using Azure.Storage.Blobs;
-using System.Text.Json;
 
 namespace AssistantsProxy.Models.Implementation
 {
@@ -35,7 +34,7 @@ namespace AssistantsProxy.Models.Implementation
                     }
                 },
                 Role = messageCreateParams.Role,
-                CreateAt = DateTime.UtcNow.Ticks,
+                CreateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
 
             var blobName = GetBlobName(threadId);
@@ -49,7 +48,7 @@ namespace AssistantsProxy.Models.Implementation
 
             threadMessages.Add(newThreadMessage);
 
-            await blobClient.UploadAsync(BinaryData.FromString(JsonSerializer.Serialize(threadMessages)), true);
+            await blobClient.UploadAsync(new BinaryData(threadMessages), true);
 
             return newThreadMessage;
         }

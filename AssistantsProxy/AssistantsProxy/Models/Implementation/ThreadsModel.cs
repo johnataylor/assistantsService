@@ -1,6 +1,5 @@
 ﻿using AssistantsProxy.Schema;
 using Azure.Storage.Blobs;
-using System.Text.Json;
 
 namespace AssistantsProxy.Models.Implementation
 {
@@ -28,10 +27,10 @@ namespace AssistantsProxy.Models.Implementation
             {
                 Object = "thread",
                 Id = $"thread_{Guid.NewGuid()}",
-                CreateAt = DateTime.UtcNow.Ticks        // TODO - unix timestamp apparently
+                CreateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
 
-            await _containerClient.UploadBlobAsync(newThread.Id, BinaryData.FromString(JsonSerializer.Serialize(newThread)));
+            await _containerClient.UploadBlobAsync(newThread.Id, new BinaryData(newThread));
 
             return newThread;
         }

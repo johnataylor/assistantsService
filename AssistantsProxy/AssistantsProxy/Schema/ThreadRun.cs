@@ -14,7 +14,7 @@ namespace AssistantsProxy.Schema
         public long? CreateAt { get; set; }
 
         [JsonPropertyName("assistant_id")]
-        public string? AsdsistantId { get; set; }
+        public string? AssistantId { get; set; }
 
         [JsonPropertyName("thread_id")]
         public string? ThreadId { get; set; }

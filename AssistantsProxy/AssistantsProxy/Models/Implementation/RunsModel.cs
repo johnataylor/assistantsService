@@ -1,29 +1,45 @@
 ﻿using AssistantsProxy.Schema;
+using Azure.Storage.Blobs;
 
 namespace AssistantsProxy.Models.Implementation
 {
     public class RunsModel : IRunsModel
     {
-        public Task<ThreadRun?> CreateAsync(string threadId, RunCreateParams runCreateParams, string? bearerToken)
+        private readonly BlobContainerClient _containerClient;
+        private const string ContainerName = "runs";
+
+        public RunsModel(IConfiguration configuration)
         {
-            // load assistant
-            // load thread
-            // load messages
+            var connectionString = configuration["BlobConnectionString"] ?? throw new ArgumentException("you must configure a blob storage connection string");
+            _containerClient = new BlobContainerClient(connectionString, ContainerName);
+        }
 
-            // enqueue workload
+        public async Task<ThreadRun?> CreateAsync(string threadId, RunCreateParams runCreateParams, string? bearerToken)
+        {
+            // validate threadId and assistantId
 
-            // save a record representing the state of the run
-            
-            // return
+            var newThreadRun = new ThreadRun
+            {
+                Object = "run",
+                Id = $"run_{Guid.NewGuid()}",
+                AssistantId = runCreateParams.AssistantId,
+                ThreadId = threadId,
+                Model = runCreateParams.Model,
+                Instructions = runCreateParams.Instructions,
+                Tools = runCreateParams.Tools,
+                CreateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+            };
 
-            throw new NotImplementedException();
+            await _containerClient.UploadBlobAsync(newThreadRun.Id, new BinaryData(newThreadRun));
+
+            // TODO: enqueue the actual work
+
+            return newThreadRun;
         }
 
         public Task<ThreadRun?> RetrieveAsync(string threadId, string runId, string? bearerToken)
         {
-            // load the state of the run
-
-            throw new NotImplementedException();
+            return BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
         }
 
         public Task<ThreadRun?> UpdateAsync(string threadId, string runId, RunUpdateParams runUpdateParams, string? bearerToken)

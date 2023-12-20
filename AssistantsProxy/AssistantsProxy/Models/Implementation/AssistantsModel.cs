@@ -1,6 +1,5 @@
 ﻿using AssistantsProxy.Schema;
 using Azure.Storage.Blobs;
-using System.Text.Json;
 
 namespace AssistantsProxy.Models.Implementation
 {
@@ -25,10 +24,10 @@ namespace AssistantsProxy.Models.Implementation
                 Instructions = assistantCreateParams.Instructions,
                 Tools = assistantCreateParams.Tools,
                 Model = assistantCreateParams.Model,
-                CreateAt = DateTime.UtcNow.Ticks        // TODO - unix timestamp apparently
+                CreateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
 
-            await _containerClient.UploadBlobAsync(newAssistant.Id, BinaryData.FromString(JsonSerializer.Serialize(newAssistant)));
+            await _containerClient.UploadBlobAsync(newAssistant.Id, new BinaryData(newAssistant));
 
             return newAssistant;
         }
