@@ -1,19 +1,24 @@
 using AssistantsProxy.Models;
+using AssistantsProxy.Models.Implementation;
 using AssistantsProxy.Models.Proxy;
 using Microsoft.AspNetCore.Diagnostics;
 using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IAssistantsModel, ProxyAssistantsModel>();
-builder.Services.AddScoped<IThreadsModel, ProxyThreadsModel>();
+// swap these implementations if you want a pass-through proxy to OpenAI
+
+builder.Services.AddScoped<IAssistantsModel, AssistantsModel>();
+builder.Services.AddScoped<IThreadsModel, ThreadsModel>();
+
+//builder.Services.AddScoped<IAssistantsModel, ProxyAssistantsModel>();
+//builder.Services.AddScoped<IThreadsModel, ProxyThreadsModel>();
+
 builder.Services.AddScoped<IMessagesModel, ProxyMessagesModel>();
 builder.Services.AddScoped<IRunsModel, ProxyRunsModel>();
 

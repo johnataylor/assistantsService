@@ -2,7 +2,7 @@
 
 namespace AssistantsProxy
 {
-    public class HttpProxyHelpers
+    public static class HttpProxyHelpers
     {
         public static async Task<string> ReadContentAsync(HttpRequest request)
         {

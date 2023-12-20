@@ -27,13 +27,13 @@ namespace AssistantsProxy.Controllers
         }
 
         [HttpGet("{threadId}")]
-        public Task<Assistant?> RetrieveAsync(string threadId)
+        public Task<AssistantThread?> RetrieveAsync(string threadId)
         {
             return _model.RetrieveAsync(threadId, BearerToken);
         }
 
         [HttpPost("{threadId}")]
-        public Task<Assistant?> UpdateAsync(string threadId, ThreadUpdateParams threadUpdateParams)
+        public Task<AssistantThread?> UpdateAsync(string threadId, ThreadUpdateParams threadUpdateParams)
         {
             return _model.UpdateAsync(threadId, threadUpdateParams, BearerToken);
         }
