@@ -17,7 +17,7 @@ namespace AssistantsProxy.Models.Implementation
 
         public async Task<Assistant?> CreateAsync(AssistantCreateParams assistantCreateParams, string? bearerToken)
         {
-            var assistant = new Assistant
+            var newAssistant = new Assistant
             {
                 Object = "assistant",
                 Id = $"asst_{Guid.NewGuid()}",
@@ -28,9 +28,9 @@ namespace AssistantsProxy.Models.Implementation
                 CreateAt = DateTime.UtcNow.Ticks        // TODO - unix timestamp apparently
             };
 
-            await _containerClient.UploadBlobAsync(assistant.Id, BinaryData.FromString(JsonSerializer.Serialize(assistant)));
+            await _containerClient.UploadBlobAsync(newAssistant.Id, BinaryData.FromString(JsonSerializer.Serialize(newAssistant)));
 
-            return assistant;
+            return newAssistant;
         }
 
         public Task DeleteAsync(string assistantId, string? bearerToken)

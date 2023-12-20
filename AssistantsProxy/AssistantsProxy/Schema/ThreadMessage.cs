@@ -23,7 +23,7 @@ namespace AssistantsProxy.Schema
         public string[]? FileIds { get; set; }
 
         [JsonPropertyName("assistant_id")]
-        public string? AsdsistantId { get; set; }
+        public string? AssistantId { get; set; }
 
         [JsonPropertyName("run_id")]
         public string? RunId { get; set; }

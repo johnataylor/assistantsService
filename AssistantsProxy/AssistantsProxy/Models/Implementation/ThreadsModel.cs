@@ -24,16 +24,16 @@ namespace AssistantsProxy.Models.Implementation
 
         public async Task<AssistantThread?> CreateAsync(ThreadCreateParams? threadCreateParams, string? bearerToken)
         {
-            var thread = new AssistantThread
+            var newThread = new AssistantThread
             {
                 Object = "thread",
                 Id = $"thread_{Guid.NewGuid()}",
                 CreateAt = DateTime.UtcNow.Ticks        // TODO - unix timestamp apparently
             };
 
-            await _containerClient.UploadBlobAsync(thread.Id, BinaryData.FromString(JsonSerializer.Serialize(thread)));
+            await _containerClient.UploadBlobAsync(newThread.Id, BinaryData.FromString(JsonSerializer.Serialize(newThread)));
 
-            return thread;
+            return newThread;
         }
 
         public Task DeleteAsync(string threadId, string? bearerToken)

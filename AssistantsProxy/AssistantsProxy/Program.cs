@@ -15,11 +15,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IAssistantsModel, AssistantsModel>();
 builder.Services.AddScoped<IThreadsModel, ThreadsModel>();
+builder.Services.AddScoped<IMessagesModel, MessagesModel>();
 
 //builder.Services.AddScoped<IAssistantsModel, ProxyAssistantsModel>();
 //builder.Services.AddScoped<IThreadsModel, ProxyThreadsModel>();
-
-builder.Services.AddScoped<IMessagesModel, ProxyMessagesModel>();
+//builder.Services.AddScoped<IMessagesModel, ProxyMessagesModel>();
 builder.Services.AddScoped<IRunsModel, ProxyRunsModel>();
 
 var app = builder.Build();
