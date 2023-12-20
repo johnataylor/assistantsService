@@ -5,7 +5,7 @@ The idea here is to create an implementation of the OpenAI Assistants API that i
 
 There is a basic pass-through "Proxy" style implementation of the protocol, just there to verify things. And then, using the same Controllers but swapping out the Models, an implementation that uses Azure blob storage for the state.
 
-So far I've done the Assistant and Thread models. You'll need a blob storage accound with "assistants" and "threads" containers added.
+So far we have the Assistant, Thread abd Message models. You'll need a blob storage accound with "assistants," "threads" and "messages" containers added.
 
 Some parts of the protocol are a work in progress:
 - pagination on the various "list" operations
@@ -15,8 +15,3 @@ Some parts of the protocol are a work in progress:
 - error handling is also missing, you'll get 500 where you should expect 404s
 - and apparently the timestamp should be unix in seconds, which seems like an odd choice in this day and age
 - anything to do with file uploading
-
-  
-
- 
-
