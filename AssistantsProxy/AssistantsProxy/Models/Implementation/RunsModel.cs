@@ -8,8 +8,12 @@ namespace AssistantsProxy.Models.Implementation
         {
             // load assistant
             // load thread
+            // load messages
+
             // enqueue workload
+
             // save a record representing the state of the run
+            
             // return
 
             throw new NotImplementedException();
