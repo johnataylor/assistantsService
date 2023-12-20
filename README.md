@@ -1,19 +1,18 @@
 # assistantsService
 Implementation of the OpenAI Assistants API.
 
-The idea here is to create an implementation of the OpenAI Assistants API that implements the stateful aspects of the service. But runs the regular functions loop against OpenAIs chat completion endpoint.
+The idea here is to create an implementation of the OpenAI Assistants API that implements the stateful aspects of the service, running the regular functions loop against the OpenAI chat completion endpoint.
 
-There is a basic pass throught "Proxy" implementation of the protocol and then the same models but this time partially implemented against Azure blob storage.
+There is a basic pass-through "Proxy" style implementation of the protocol, just there to verify things. And then, using the same Controllers but swapping out the Models, an implementation that uses Azure blob storage for the state.
 
-So far I've done the Assistant and Thread models. You'll need a blob storage accound and create the assistants and threads containers (I guess I could create those on demand in the code fwiw.)
+So far I've done the Assistant and Thread models. You'll need a blob storage accound with "assistants" and "threads" containers added.
 
-Parts of the protocol are incomplete:
-- pagination
-- most of the updates
-- thread create-and-run
+Some parts of the protocol are a work in progress:
+- pagination on the various "list" operations
+- most of the updates, bother the schema and the implementation
 - metadata
-- then all the 404s
-- and duplicate errors
+- thread create-and-run
+- error handling is also missing, you'll get 500 where you should expect 404s
 - and apparently the timestamp should be unix in seconds, which seems like an odd choice in this day and age
 - anything to do with file uploading
 
