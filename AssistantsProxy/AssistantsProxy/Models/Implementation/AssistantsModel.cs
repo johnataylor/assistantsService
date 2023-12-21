@@ -20,10 +20,13 @@ namespace AssistantsProxy.Models.Implementation
             {
                 Object = "assistant",
                 Id = $"asst_{Guid.NewGuid()}",
-                Name = assistantCreateParams.Name,
-                Instructions = assistantCreateParams.Instructions,
-                Tools = assistantCreateParams.Tools,
                 Model = assistantCreateParams.Model,
+                Instructions = assistantCreateParams.Instructions,
+                Name = assistantCreateParams.Name,
+                Description = assistantCreateParams.Description,
+                Metadata = assistantCreateParams.Metadata,
+                Tools = assistantCreateParams.Tools,
+                FileIds = assistantCreateParams.FileIds,
                 CreateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
 
@@ -58,10 +61,13 @@ namespace AssistantsProxy.Models.Implementation
                 return null;
             }
 
-            assistant.Instructions = assistantUpdateParams.Instructions ?? assistant.Instructions;
             assistant.Model = assistantUpdateParams.Model ?? assistant.Model;
+            assistant.Instructions = assistantUpdateParams.Instructions ?? assistant.Instructions;
             assistant.Name = assistantUpdateParams.Name ?? assistant.Name;
+            assistant.Description = assistantUpdateParams.Description ?? assistant.Description;
+            assistant.Metadata = assistantUpdateParams.Metadata ?? assistant.Metadata;
             assistant.Tools = assistantUpdateParams.Tools ?? assistant.Tools;
+            assistant.FileIds = assistantUpdateParams.FileIds ?? assistant.FileIds;
 
             var blobClient = _containerClient.GetBlobClient(assistantId);
             await blobClient.UploadAsync(new BinaryData(assistant), true);

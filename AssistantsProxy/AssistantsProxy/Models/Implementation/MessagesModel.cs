@@ -20,7 +20,7 @@ namespace AssistantsProxy.Models.Implementation
 
             var newThreadMessage = new ThreadMessage
             {
-                Object = "message",
+                Object = "thread.message",
                 Id = $"msg_{Guid.NewGuid()}",
                 Content = new []
                 {

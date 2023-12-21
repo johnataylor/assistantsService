@@ -7,6 +7,7 @@ namespace AssistantsProxy.Schema
         [JsonPropertyName("id")]
         public string? Id { get; set; }
 
+        // 'assistant.run'
         [JsonPropertyName("object")]
         public string? Object { get; set; }
 
@@ -19,6 +20,7 @@ namespace AssistantsProxy.Schema
         [JsonPropertyName("thread_id")]
         public string? ThreadId { get; set; }
 
+        // 'queued' | 'in_progress' | 'requires_action' | 'cancelling' | 'cancelled' | 'failed' | 'completed' | 'expired'
         [JsonPropertyName("status")]
         public string? Status { get; set; }
 
@@ -42,6 +44,12 @@ namespace AssistantsProxy.Schema
 
         [JsonPropertyName("instructions")]
         public string? Instructions { get; set; }
+
+        [JsonPropertyName("required_action")]
+        public RequiredAction? RequiredAction { get; set; }
+
+        [JsonPropertyName("last_error")]
+        public LastError? LastError { get; set; }
 
         [JsonPropertyName("tools")]
         public Tool[]? Tools { get; set; }

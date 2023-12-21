@@ -7,6 +7,7 @@ namespace AssistantsProxy.Schema
         [JsonPropertyName("id")]
         public string? Id { get; set; }
 
+        // 'thread'
         [JsonPropertyName("object")]
         public string? Object { get; set; }
 

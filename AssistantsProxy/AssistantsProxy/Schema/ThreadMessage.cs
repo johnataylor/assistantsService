@@ -7,12 +7,14 @@ namespace AssistantsProxy.Schema
         [JsonPropertyName("id")]
         public string? Id { get; set; }
 
+        // 'thread.message'
         [JsonPropertyName("object")]
         public string? Object { get; set; }
 
         [JsonPropertyName("create_at")]
         public long? CreateAt { get; set; }
 
+        // 'user' | 'assistant'
         [JsonPropertyName("role")]
         public string? Role { get; set; }
 

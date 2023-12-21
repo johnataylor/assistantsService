@@ -20,7 +20,7 @@ namespace AssistantsProxy.Models.Implementation
 
             var newThreadRun = new ThreadRun
             {
-                Object = "run",
+                Object = "assistant.run",
                 Id = $"run_{Guid.NewGuid()}",
                 AssistantId = runCreateParams.AssistantId,
                 ThreadId = threadId,
