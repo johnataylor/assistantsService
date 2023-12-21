@@ -49,16 +49,24 @@ namespace AssistantsProxy.Models.Implementation
             return BlobStorageHelpers.DownloadAsync<Assistant>(_containerClient, assistantId);
         }
 
-        public Task<Assistant?> UpdateAsync(string assistantId, AssistantUpdateParams assistantUpdateParams, string? bearerToken)
+        public async Task<Assistant?> UpdateAsync(string assistantId, AssistantUpdateParams assistantUpdateParams, string? bearerToken)
         {
-            // TODO
+            var assistant = await BlobStorageHelpers.DownloadAsync<Assistant>(_containerClient, assistantId);
 
-            // load
-            // update
-            // save
-            // return
+            if (assistant == null)
+            {
+                return null;
+            }
 
-            throw new NotImplementedException();
+            assistant.Instructions = assistantUpdateParams.Instructions ?? assistant.Instructions;
+            assistant.Model = assistantUpdateParams.Model ?? assistant.Model;
+            assistant.Name = assistantUpdateParams.Name ?? assistant.Name;
+            assistant.Tools = assistantUpdateParams.Tools ?? assistant.Tools;
+
+            var blobClient = _containerClient.GetBlobClient(assistantId);
+            await blobClient.UploadAsync(new BinaryData(assistant), true);
+
+            return assistant;
         }
     }
 }

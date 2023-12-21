@@ -40,10 +40,17 @@ namespace AssistantsProxy
 
         public static async Task<T?> DownloadAsync<T>(BlobContainerClient containerClient, string blobName)
         {
-            var blobClient = containerClient.GetBlobClient(blobName);
-            var download = await blobClient.DownloadContentAsync();
-            var json = Encoding.UTF8.GetString(download.Value.Content);
-            return JsonSerializer.Deserialize<T>(json);
+            try
+            {
+                var blobClient = containerClient.GetBlobClient(blobName);
+                var download = await blobClient.DownloadContentAsync();
+                var json = Encoding.UTF8.GetString(download.Value.Content);
+                return JsonSerializer.Deserialize<T>(json);
+            }
+            catch (RequestFailedException)
+            {
+                return default;
+            }
         }
     }
 }

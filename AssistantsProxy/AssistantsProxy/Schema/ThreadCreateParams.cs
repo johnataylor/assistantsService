@@ -1,9 +1,13 @@
-﻿namespace AssistantsProxy.Schema
+﻿using System.Text.Json.Serialization;
+
+namespace AssistantsProxy.Schema
 {
     public class ThreadCreateParams
     {
-        // Messages
+        [JsonPropertyName("messages")]
+        public MessageCreateParams[]? Messages { get; set; }
 
-        // Metadata
+        [JsonPropertyName("metadata")]
+        public Metadata? Metadata { get; set; }
     }
 }
