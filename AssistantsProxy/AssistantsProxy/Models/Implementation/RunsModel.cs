@@ -1,4 +1,5 @@
 ﻿using AssistantsProxy.Schema;
+using AssistantsProxy.Services;
 using Azure.Storage.Blobs;
 
 namespace AssistantsProxy.Models.Implementation
@@ -6,12 +7,15 @@ namespace AssistantsProxy.Models.Implementation
     public class RunsModel : IRunsModel
     {
         private readonly BlobContainerClient _containerClient;
+        private readonly IRunsWorkQueue<RunsWorkItemValue> _queue;
+
         private const string ContainerName = "runs";
 
-        public RunsModel(IConfiguration configuration)
+        public RunsModel(IConfiguration configuration, IRunsWorkQueue<RunsWorkItemValue> queue)
         {
             var connectionString = configuration["BlobConnectionString"] ?? throw new ArgumentException("you must configure a blob storage connection string");
             _containerClient = new BlobContainerClient(connectionString, ContainerName);
+            _queue = queue;
         }
 
         public async Task<ThreadRun?> CreateAsync(string threadId, RunCreateParams runCreateParams, string? bearerToken)
@@ -32,7 +36,7 @@ namespace AssistantsProxy.Models.Implementation
 
             await _containerClient.UploadBlobAsync(newThreadRun.Id, new BinaryData(newThreadRun));
 
-            // TODO: enqueue the actual work
+            await _queue.EnqueueAsync(new RunsWorkItemValue { AssistantId = runCreateParams.AssistantId, ThreadId = threadId, RunId = newThreadRun.Id });
 
             return newThreadRun;
         }

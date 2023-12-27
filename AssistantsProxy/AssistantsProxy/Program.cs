@@ -1,6 +1,7 @@
 using AssistantsProxy.Models;
 using AssistantsProxy.Models.Implementation;
 using AssistantsProxy.Models.Proxy;
+using AssistantsProxy.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -17,6 +18,8 @@ builder.Services.AddScoped<IAssistantsModel, AssistantsModel>();
 builder.Services.AddScoped<IThreadsModel, ThreadsModel>();
 builder.Services.AddScoped<IMessagesModel, MessagesModel>();
 builder.Services.AddScoped<IRunsModel, RunsModel>();
+
+builder.Services.AddHostedService<RunsHostedService>();
 
 //builder.Services.AddScoped<IAssistantsModel, ProxyAssistantsModel>();
 //builder.Services.AddScoped<IThreadsModel, ProxyThreadsModel>();

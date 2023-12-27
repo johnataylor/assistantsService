@@ -1,7 +1,6 @@
 ﻿using AssistantsProxy.Models;
 using AssistantsProxy.Schema;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace AssistantsProxy.Controllers
 {
