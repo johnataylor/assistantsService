@@ -22,11 +22,13 @@ namespace AssistantsProxy.Models.Implementation
         {
             // validate threadId and assistantId
 
+            var assistantId = runCreateParams.AssistantId ?? throw new ArgumentNullException("runCreateParams.AssistantId");
+
             var newThreadRun = new ThreadRun
             {
                 Object = "assistant.run",
                 Id = $"run_{Guid.NewGuid()}",
-                AssistantId = runCreateParams.AssistantId,
+                AssistantId = assistantId,
                 ThreadId = threadId,
                 Model = runCreateParams.Model,
                 Instructions = runCreateParams.Instructions,
@@ -36,7 +38,7 @@ namespace AssistantsProxy.Models.Implementation
 
             await _containerClient.UploadBlobAsync(newThreadRun.Id, new BinaryData(newThreadRun));
 
-            await _queue.EnqueueAsync(new RunsWorkItemValue { AssistantId = runCreateParams.AssistantId, ThreadId = threadId, RunId = newThreadRun.Id });
+            await _queue.EnqueueAsync(new RunsWorkItemValue(assistantId, threadId, newThreadRun.Id));
 
             return newThreadRun;
         }

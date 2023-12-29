@@ -9,14 +9,16 @@ namespace AssistantsProxy.Services
         private readonly MessagesModel _messagesModel;
         private readonly RunsModel _runsModel;
         private readonly IRunsWorkQueue<RunsWorkItemValue> _queue;
+        private readonly IChatClient _chatClient;
 
-        public RunsHostedService(IConfiguration configuration, IRunsWorkQueue<RunsWorkItemValue> queue)
+        public RunsHostedService(IConfiguration configuration, IRunsWorkQueue<RunsWorkItemValue> queue, IChatClient chatClient)
         {
             _assistantsModel = new AssistantsModel(configuration);
             _threadsModel = new ThreadsModel(configuration);
             _messagesModel = new MessagesModel(configuration);
             _runsModel = new RunsModel(configuration, queue);
             _queue = queue;
+            _chatClient = chatClient;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -33,27 +35,33 @@ namespace AssistantsProxy.Services
                 {
                     var value = response.Value;
 
-                    // (1) load metadata
+                    // Load metadata
 
-                    //   (1.1) load assistant
+                    var assistant = await _assistantsModel.RetrieveAsync(value.AssistantId, null);
 
-                    //   (1.2) load thread
+                    var asssitantThread = await _threadsModel.RetrieveAsync(value.ThreadId, null);
 
-                    //   (1.3) load run
+                    var run = await _runsModel.RetrieveAsync(value.ThreadId, value.RunId, null);
 
-                    // (2) run the regular Chat Completion Functions loop
+                    // Run the regular Chat Completion Functions loop
 
-                    //   (2.1) load messages
+                    // BEGIN LOOP
 
-                    //   (2.2) create prompt
+                    var currentMessages = await _messagesModel.ListAsync(value.ThreadId, null);
 
-                    //   (2.3) call GPT
+                    var prompt = PromptFactory.Create(assistant, asssitantThread, run, currentMessages?.Data);
 
-                    //   (2.4) update messages
+                    var newMessage = await _chatClient.CallAsync(prompt);
 
-                    //   (2.5) save messages
+                    var updatedMessages = MessageManager.Update(currentMessages?.Data, newMessage);
 
-                    // (3) update run status
+                    // save updated messages
+
+                    // END LOOP
+
+                    // Update run status
+
+                    // TODO...
 
                     await response.AcknowledgeAsync();
                 }

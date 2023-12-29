@@ -19,6 +19,9 @@ builder.Services.AddScoped<IThreadsModel, ThreadsModel>();
 builder.Services.AddScoped<IMessagesModel, MessagesModel>();
 builder.Services.AddScoped<IRunsModel, RunsModel>();
 
+builder.Services.AddSingleton<IRunsWorkQueue<RunsWorkItemValue>, RunsWorkQueue>();
+builder.Services.AddSingleton<IChatClient, ChatClient>();
+
 builder.Services.AddHostedService<RunsHostedService>();
 
 //builder.Services.AddScoped<IAssistantsModel, ProxyAssistantsModel>();
