@@ -28,6 +28,7 @@ namespace AssistantsProxy.Models.Implementation
             {
                 Object = "assistant.run",
                 Id = $"run_{Guid.NewGuid()}",
+                Status = "queued",
                 AssistantId = assistantId,
                 ThreadId = threadId,
                 Model = runCreateParams.Model,
@@ -57,6 +58,18 @@ namespace AssistantsProxy.Models.Implementation
             // delete the run
 
             throw new NotImplementedException();
+        }
+
+        internal async Task SetStatus(string runId, string status)
+        {
+            var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
+
+            threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
+
+            threadRun.Status = status;
+
+            var blobClient = _containerClient.GetBlobClient(runId);
+            await blobClient.UploadAsync(new BinaryData(threadRun), true);
         }
     }
 }
