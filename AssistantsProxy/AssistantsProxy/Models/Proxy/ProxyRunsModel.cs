@@ -36,5 +36,12 @@ namespace AssistantsProxy.Models.Proxy
 
             return JsonSerializer.Deserialize<ThreadRun>(content);
         }
+
+        public async Task SubmitToolsOutputs(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams, string? bearerToken)
+        {
+            var inboundContent = JsonSerializer.Serialize(runSubmitToolOutputsParams);
+
+            await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/threads/" + threadId + "/runs/" + runId + "/submit_tool_outputs", inboundContent, Constants.OpenAIBeta, bearerToken);
+        }
     }
 }

@@ -55,8 +55,10 @@ namespace AssistantsProxy.Models.Implementation
         }
         public Task<ThreadRun?> CancelAsync(string threadId, string runId, string? bearerToken)
         {
-            // delete the run
-
+            throw new NotImplementedException();
+        }
+        public Task SubmitToolsOutputs(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams, string? bearerToken)
+        {
             throw new NotImplementedException();
         }
 

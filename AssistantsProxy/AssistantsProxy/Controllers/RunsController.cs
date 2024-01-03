@@ -37,5 +37,11 @@ namespace AssistantsProxy.Controllers
         {
             return _model.CancelAsync(threadId, runId, BearerToken);
         }
+
+        [HttpPost("{runId}/submit_tool_outputs")]
+        public Task SubmitToolsOutputs([FromRoute]string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams)
+        {
+            return _model.SubmitToolsOutputs(threadId, runId, runSubmitToolOutputsParams, BearerToken);
+        }
     }
 }
