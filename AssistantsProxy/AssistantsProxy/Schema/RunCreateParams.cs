@@ -15,5 +15,8 @@ namespace AssistantsProxy.Schema
 
         [JsonPropertyName("model")]
         public string? Model { get; set; }
+
+        [JsonPropertyName("metadata")]
+        public Metadata? Metadata { get; set; }
     }
 }
