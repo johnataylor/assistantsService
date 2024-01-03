@@ -28,6 +28,7 @@ builder.Services.AddHostedService<RunsHostedService>();
 //builder.Services.AddScoped<IThreadsModel, ProxyThreadsModel>();
 //builder.Services.AddScoped<IMessagesModel, ProxyMessagesModel>();
 //builder.Services.AddScoped<IRunsModel, ProxyRunsModel>();
+//builder.Services.AddScoped<IStepsModel, ProxyStepsModel>();
 
 var app = builder.Build();
 
