@@ -10,7 +10,7 @@ namespace AssistantsProxy.Services
 
         public ChatClient(IConfiguration configuration)
         {
-            _deploymentOrModelName = configuration["DeploymentOrModelName"] ?? throw new ArgumentException("missing configuration for DeploymentOrModelName");
+            _deploymentOrModelName = configuration["DeploymentOrModelName"] ?? "gpt-4-1106-preview";
             var openAIKey = configuration["OpenAIKey"] ?? throw new ArgumentException("missing configuration for OpenAIKey");
             _client = new OpenAIClient(openAIKey);
         }
