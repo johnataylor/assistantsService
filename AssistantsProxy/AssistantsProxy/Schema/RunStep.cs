@@ -42,8 +42,8 @@ namespace AssistantsProxy.Schema
         [JsonPropertyName("status")]
         public string? Status { get; set; }
 
-        // TODO object model for step details
-        //step_details: MessageCreationStepDetails | ToolCallsStepDetails;
+        [JsonPropertyName("step_details")]
+        public StepDetailsBase? StepDetails { get; set; }
 
         [JsonPropertyName("thread_id")]
         public string? ThreadId { get; set; }
