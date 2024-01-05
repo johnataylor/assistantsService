@@ -27,7 +27,7 @@ namespace AssistantsProxy.Models.Implementation
                 Metadata = assistantCreateParams.Metadata,
                 Tools = assistantCreateParams.Tools,
                 FileIds = assistantCreateParams.FileIds,
-                CreateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
 
             await _containerClient.UploadBlobAsync(newAssistant.Id, new BinaryData(newAssistant));

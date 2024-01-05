@@ -34,7 +34,7 @@ namespace AssistantsProxy.Models.Implementation
                     }
                 },
                 Role = messageCreateParams.Role,
-                CreateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
 
             var blobName = GetBlobName(threadId);

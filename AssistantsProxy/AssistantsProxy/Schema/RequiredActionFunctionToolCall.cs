@@ -12,6 +12,6 @@ namespace AssistantsProxy.Schema
         public string? Type { get; set; }
 
         [JsonPropertyName("function")]
-        public Function? Function { get; set; }
+        public RequiredActionFunctionToolCallFunction? Function { get; set; }
     }
 }

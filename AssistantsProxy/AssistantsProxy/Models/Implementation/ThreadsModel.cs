@@ -30,7 +30,7 @@ namespace AssistantsProxy.Models.Implementation
             {
                 Object = "thread",
                 Id = $"thread_{Guid.NewGuid()}",
-                CreateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 Metadata = threadCreateParams?.Metadata
             };
 

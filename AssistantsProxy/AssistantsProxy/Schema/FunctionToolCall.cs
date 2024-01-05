@@ -8,6 +8,6 @@ namespace AssistantsProxy.Schema
         public string? Id { get; set; }
 
         [JsonPropertyName("function")]
-        public Function? Function { get; set; }
+        public FunctionToolCallFunction? Function { get; set; }
     }
 }

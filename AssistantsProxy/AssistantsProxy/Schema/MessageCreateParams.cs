@@ -12,7 +12,7 @@ namespace AssistantsProxy.Schema
         public string? Content { get; set; }
 
         [JsonPropertyName("file_ids")]
-        public string[]? FileIds { get; set; }
+        public string[]? FileIds { get; set; } = new string[0];
 
         [JsonPropertyName("metadata")]
         public string? Metadata { get; set; }

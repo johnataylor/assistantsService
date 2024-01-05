@@ -2,7 +2,7 @@
 
 namespace AssistantsProxy.Schema
 {
-    public class Function
+    public class RequiredActionFunctionToolCallFunction
     {
         [JsonPropertyName("name")]
         public string? Name { get; set; }

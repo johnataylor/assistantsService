@@ -34,7 +34,7 @@ namespace AssistantsProxy.Models.Implementation
                 Model = runCreateParams.Model,
                 Instructions = runCreateParams.Instructions,
                 Tools = runCreateParams.Tools,
-                CreateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
 
             await _containerClient.UploadBlobAsync(newThreadRun.Id, new BinaryData(newThreadRun));

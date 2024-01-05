@@ -4,9 +4,9 @@ using System.Text.Json.Serialization;
 namespace AssistantsProxy.Schema
 {
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-    [JsonDerivedType(typeof(MessageCreationStepDetails), typeDiscriminator: "code_interpreter")]
-    [JsonDerivedType(typeof(ToolCallsStepDetails), typeDiscriminator: "retrieval")]
-    [JsonDerivedType(typeof(ToolCallsStepDetails), typeDiscriminator: "function")]
+    [JsonDerivedType(typeof(CodeToolCall), typeDiscriminator: "code_interpreter")]
+    [JsonDerivedType(typeof(RetrievalToolCall), typeDiscriminator: "retrieval")]
+    [JsonDerivedType(typeof(FunctionToolCall), typeDiscriminator: "function")]
     [SwaggerDiscriminator("type")]
     [SwaggerSubType(typeof(CodeToolCall), DiscriminatorValue = "code_interpreter")]
     [SwaggerSubType(typeof(RetrievalToolCall), DiscriminatorValue = "retrieval")]

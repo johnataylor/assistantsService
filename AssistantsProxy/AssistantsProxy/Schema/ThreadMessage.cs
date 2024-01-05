@@ -11,8 +11,8 @@ namespace AssistantsProxy.Schema
         [JsonPropertyName("object")]
         public string? Object { get; set; }
 
-        [JsonPropertyName("create_at")]
-        public long? CreateAt { get; set; }
+        [JsonPropertyName("created_at")]
+        public long? CreatedAt { get; set; }
 
         // 'user' | 'assistant'
         [JsonPropertyName("role")]

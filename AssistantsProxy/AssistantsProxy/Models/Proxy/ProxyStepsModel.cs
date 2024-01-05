@@ -17,6 +17,8 @@ namespace AssistantsProxy.Models.Proxy
         {
             var (_, __, content) = await HttpProxyHelpers.MakeGetRequest(Constants.BaseUri + "/v1/threads/" + threadId + "/runs/" + runId + "/steps", Constants.OpenAIBeta, bearerToken);
 
+            content = JsonHelpers.FixJson(content);
+
             return JsonSerializer.Deserialize<AssistantList<RunStep>>(content);
         }
     }
