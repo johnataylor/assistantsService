@@ -11,7 +11,7 @@ namespace AssistantsProxy.Schema
         public string? Description { get; set; }
 
         [JsonPropertyName("file_ids")]
-        public string[]? FileIds { get; set; }
+        public string[] FileIds { get; set; } = new string[0];
 
         [JsonPropertyName("instructions")]
         public string? Instructions { get; set; }
@@ -23,6 +23,6 @@ namespace AssistantsProxy.Schema
         public string? Name { get; set; }
 
         [JsonPropertyName("tools")]
-        public Tool[]? Tools { get; set; }
+        public AssistantToolsBase[]? Tools { get; set; }
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AssistantsProxy.Controllers
 {
-    [Route("/v1/threads/{threadId}/runs/${runId}/steps")]
+    [Route("/v1/threads/{threadId}/runs/{runId}/steps")]
     public class StepsController : AssistantsControllerBase
     {
         private readonly IStepsModel _model;

@@ -57,7 +57,7 @@ namespace AssistantsProxy.Models.Implementation
         {
             throw new NotImplementedException();
         }
-        public Task SubmitToolsOutputs(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams, string? bearerToken)
+        public Task<ThreadRun?> SubmitToolsOutputs(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams, string? bearerToken)
         {
             throw new NotImplementedException();
         }

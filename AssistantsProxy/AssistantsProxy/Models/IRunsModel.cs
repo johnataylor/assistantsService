@@ -8,6 +8,6 @@ namespace AssistantsProxy.Models
         Task<ThreadRun?> RetrieveAsync(string threadId, string runId, string? bearerToken);
         Task<ThreadRun?> UpdateAsync(string threadId, string runId, RunUpdateParams runUpdateParams, string? bearerToken);
         Task<ThreadRun?> CancelAsync(string threadId, string runId, string? bearerToken);
-        Task SubmitToolsOutputs(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams, string? bearerToken);
+        Task<ThreadRun?> SubmitToolsOutputs(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams, string? bearerToken);
     }
 }

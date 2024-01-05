@@ -26,7 +26,7 @@ namespace AssistantsProxy.Services
             return options;
         }
 
-        private static FunctionDefinition CreateFunctionDefinition(Tool tool)
+        private static FunctionDefinition CreateFunctionDefinition(AssistantToolsFunction tool)
         {
             return new FunctionDefinition();
         }

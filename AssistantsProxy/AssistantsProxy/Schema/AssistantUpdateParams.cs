@@ -23,6 +23,6 @@ namespace AssistantsProxy.Schema
         public string? Name { get; set; }
 
         [JsonPropertyName("tools")]
-        public Tool[]? Tools { get; set; }
+        public AssistantToolsBase[]? Tools { get; set; }
     }
 }

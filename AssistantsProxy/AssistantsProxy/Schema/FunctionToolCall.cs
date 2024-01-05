@@ -7,6 +7,7 @@ namespace AssistantsProxy.Schema
         [JsonPropertyName("id")]
         public string? Id { get; set; }
 
+        [JsonPropertyName("function")]
         public Function? Function { get; set; }
     }
 }

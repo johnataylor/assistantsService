@@ -39,7 +39,7 @@ namespace AssistantsProxy.Controllers
         }
 
         [HttpPost("{runId}/submit_tool_outputs")]
-        public Task SubmitToolsOutputs([FromRoute]string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams)
+        public Task<ThreadRun?> SubmitToolsOutputs([FromRoute]string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams)
         {
             return _model.SubmitToolsOutputs(threadId, runId, runSubmitToolOutputsParams, BearerToken);
         }

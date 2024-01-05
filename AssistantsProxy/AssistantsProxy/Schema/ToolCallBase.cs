@@ -3,6 +3,10 @@ using System.Text.Json.Serialization;
 
 namespace AssistantsProxy.Schema
 {
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+    [JsonDerivedType(typeof(MessageCreationStepDetails), typeDiscriminator: "code_interpreter")]
+    [JsonDerivedType(typeof(ToolCallsStepDetails), typeDiscriminator: "retrieval")]
+    [JsonDerivedType(typeof(ToolCallsStepDetails), typeDiscriminator: "function")]
     [SwaggerDiscriminator("type")]
     [SwaggerSubType(typeof(CodeToolCall), DiscriminatorValue = "code_interpreter")]
     [SwaggerSubType(typeof(RetrievalToolCall), DiscriminatorValue = "retrieval")]
@@ -10,7 +14,5 @@ namespace AssistantsProxy.Schema
 
     public abstract class ToolCallBase
     {
-        [JsonPropertyName("type")]
-        public string? Type { get; set; }
     }
 }

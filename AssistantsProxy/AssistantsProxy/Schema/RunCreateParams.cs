@@ -11,7 +11,7 @@ namespace AssistantsProxy.Schema
         public string? Instructions { get; set; }
 
         [JsonPropertyName("tools")]
-        public Tool[]? Tools { get; set; }
+        public AssistantToolsBase[]? Tools { get; set; }
 
         [JsonPropertyName("model")]
         public string? Model { get; set; }
