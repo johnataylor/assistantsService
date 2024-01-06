@@ -77,7 +77,7 @@ namespace AssistantsProxy.Models.Implementation
 
             var threadMessages = await BlobStorageHelpers.DownloadAsync<List<ThreadMessage>>(_containerClient, blobName) ?? new List<ThreadMessage>();
 
-            var threadMessage = threadMessages.FirstOrDefault(threadMessage => threadMessage.Id == messageId);
+            var threadMessage = threadMessages.FirstOrDefault(item => item.Id == messageId);
 
             return threadMessage;
         }

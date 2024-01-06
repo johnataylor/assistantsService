@@ -9,6 +9,8 @@ namespace AssistantsProxy.Services
         private readonly ThreadsModel _threadsModel;
         private readonly MessagesModel _messagesModel;
         private readonly RunsModel _runsModel;
+        private readonly StepsModel _stepsModel;
+
         private readonly IRunsWorkQueue<RunsWorkItemValue> _queue;
         private readonly IChatClient _chatClient;
 
@@ -18,6 +20,7 @@ namespace AssistantsProxy.Services
             _threadsModel = new ThreadsModel(configuration);
             _messagesModel = new MessagesModel(configuration);
             _runsModel = new RunsModel(configuration, queue);
+            _stepsModel = new StepsModel(configuration);
             _queue = queue;
             _chatClient = chatClient;
         }

@@ -14,14 +14,82 @@ namespace AssistantsProxy.Models.Implementation
             _containerClient = new BlobContainerClient(connectionString, ContainerName);
         }
 
-        public Task<AssistantList<RunStep>?> ListAsync(string threadId, string runId, string? bearerToken)
+        public async Task<AssistantList<RunStep>?> ListAsync(string threadId, string runId, string? bearerToken)
         {
-            throw new NotImplementedException();
+            // TODO check the thread and run exist
+
+            var blobName = GetBlobName(threadId, runId);
+
+            var threadRunSteps = await BlobStorageHelpers.DownloadAsync<List<RunStep>>(_containerClient, blobName) ?? new List<RunStep>();
+
+            var assistantList = new AssistantList<RunStep>
+            {
+                Data = threadRunSteps.ToArray()
+            };
+
+            return assistantList;
         }
 
-        public Task<RunStep?> RetrieveAsync(string threadId, string runId, string stepId, string? bearerToken)
+        public async Task<RunStep?> RetrieveAsync(string threadId, string runId, string stepId, string? bearerToken)
         {
-            throw new NotImplementedException();
+            // TODO check the thread and run exist
+
+            var blobName = GetBlobName(threadId, runId);
+
+            var runSteps = await BlobStorageHelpers.DownloadAsync<List<RunStep>>(_containerClient, blobName) ?? new List<RunStep>();
+
+            var runStep = runSteps.FirstOrDefault(item => item.Id == stepId);
+
+            return runStep;
         }
+
+        internal Task AddMessageCreationStepAsync(string threadId, string runId, string assistantId, string messageId)
+        {
+            var stepDetails = new MessageCreationStepDetails
+            {
+                MessageCreation = new MessageCreation { MessageId = messageId },
+            };
+
+            return AddStepAsync(threadId, runId, assistantId, "message_creation", stepDetails);
+        }
+        internal Task AddFunctionToolCallsStepAsync(string threadId, string runId, string assistantId, FunctionToolCall[] toolCalls)
+        {
+            var stepDetails = new ToolCallsStepDetails
+            {
+                ToolCalls = toolCalls,
+            };
+
+            return AddStepAsync(threadId, runId, assistantId, "tool_calls", stepDetails);
+        }
+
+        private async Task AddStepAsync(string threadId, string runId, string assistantId, string type, StepDetailsBase stepDetails)
+        {
+            var newRunStep = new RunStep
+            {
+                Object = "thread.run.step",
+                Id = $"step_{Guid.NewGuid()}",
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                StepDetails = stepDetails,
+                ThreadId = threadId,
+                RunId = runId,
+                AssistantId = assistantId,
+                Type = type
+            };
+
+            var blobName = GetBlobName(threadId, runId);
+            var blobClient = _containerClient.GetBlobClient(blobName);
+
+            var runSteps = await blobClient.ExistsAsync()
+                    ?
+                await BlobStorageHelpers.DownloadAsync<List<RunStep>>(_containerClient, blobName) ?? new List<RunStep>()
+                    :
+                new List<RunStep>();
+
+            runSteps.Add(newRunStep);
+
+            await blobClient.UploadAsync(new BinaryData(runSteps), true);
+        }
+
+        private string GetBlobName(string threadId, string runId) => $"{threadId}_{runId}_steps";
     }
 }
