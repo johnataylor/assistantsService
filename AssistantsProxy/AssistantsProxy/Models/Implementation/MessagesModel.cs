@@ -46,7 +46,7 @@ namespace AssistantsProxy.Models.Implementation
                     :
                 new List<ThreadMessage>();
 
-            threadMessages.Add(newThreadMessage);
+            threadMessages.Insert(0, newThreadMessage);
 
             await blobClient.UploadAsync(new BinaryData(threadMessages), true);
 

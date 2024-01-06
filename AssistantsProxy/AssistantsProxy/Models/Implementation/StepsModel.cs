@@ -50,7 +50,7 @@ namespace AssistantsProxy.Models.Implementation
                 MessageCreation = new MessageCreation { MessageId = messageId },
             };
 
-            return AddStepAsync(threadId, runId, assistantId, "message_creation", stepDetails);
+            return AddStepAsync(threadId, runId, assistantId, "message_creation", "completed", stepDetails);
         }
         internal Task AddFunctionToolCallsStepAsync(string threadId, string runId, string assistantId, FunctionToolCall[] toolCalls)
         {
@@ -59,10 +59,10 @@ namespace AssistantsProxy.Models.Implementation
                 ToolCalls = toolCalls,
             };
 
-            return AddStepAsync(threadId, runId, assistantId, "tool_calls", stepDetails);
+            return AddStepAsync(threadId, runId, assistantId, "tool_calls", "in_progress", stepDetails);
         }
 
-        private async Task AddStepAsync(string threadId, string runId, string assistantId, string type, StepDetailsBase stepDetails)
+        private async Task AddStepAsync(string threadId, string runId, string assistantId, string type, string status, StepDetailsBase stepDetails)
         {
             var newRunStep = new RunStep
             {
@@ -73,7 +73,8 @@ namespace AssistantsProxy.Models.Implementation
                 ThreadId = threadId,
                 RunId = runId,
                 AssistantId = assistantId,
-                Type = type
+                Type = type,
+                Status = status
             };
 
             var blobName = GetBlobName(threadId, runId);

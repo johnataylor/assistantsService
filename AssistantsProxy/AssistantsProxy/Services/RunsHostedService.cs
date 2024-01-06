@@ -77,7 +77,11 @@ namespace AssistantsProxy.Services
                             Role = newMessage.Role
                         };
 
-                        await _messagesModel.CreateAsync(value.ThreadId, messageCreateParams, null);
+                        var newThreadMessage = await _messagesModel.CreateAsync(value.ThreadId, messageCreateParams, null);
+
+                        var newThreadMessageId = newThreadMessage?.Id ?? throw new Exception("create new message failed");
+
+                        await _stepsModel.AddMessageCreationStepAsync(value.ThreadId, value.RunId, value.AssistantId, newThreadMessageId);
 
                         // END LOOP
 
