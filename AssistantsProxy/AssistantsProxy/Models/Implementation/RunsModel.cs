@@ -39,7 +39,7 @@ namespace AssistantsProxy.Models.Implementation
 
             await _containerClient.UploadBlobAsync(newThreadRun.Id, new BinaryData(newThreadRun));
 
-            await _queue.EnqueueAsync(new RunsWorkItemValue(assistantId, threadId, newThreadRun.Id));
+            await _queue.EnqueueAsync(new RunsWorkItemValue(assistantId, threadId, newThreadRun.Id, null));
 
             return newThreadRun;
         }
@@ -57,23 +57,74 @@ namespace AssistantsProxy.Models.Implementation
         {
             throw new NotImplementedException();
         }
-        public Task<ThreadRun?> SubmitToolsOutputs(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams, string? bearerToken)
+        public async Task<ThreadRun?> SubmitToolsOutputs(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams, string? bearerToken)
         {
-            // enqueue work item for tool outputs
+            var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
+            threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
 
-            throw new NotImplementedException();
+            ValidateToolOutputIds(threadRun, runSubmitToolOutputsParams);
+
+            var assistantId = threadRun?.AssistantId ?? throw new Exception("assistant id on run is null");
+
+            threadRun.Status = "queued";
+
+            var blobClient = _containerClient.GetBlobClient(runId);
+            await blobClient.UploadAsync(new BinaryData(threadRun), true);
+
+            await _queue.EnqueueAsync(new RunsWorkItemValue(assistantId, threadId, runId, runSubmitToolOutputsParams));
+
+            return threadRun;
         }
 
         internal async Task SetStatus(string runId, string status)
         {
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
-
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
 
             threadRun.Status = status;
 
             var blobClient = _containerClient.GetBlobClient(runId);
             await blobClient.UploadAsync(new BinaryData(threadRun), true);
+        }
+
+        internal async Task SetRequiredAction(string runId, IList<RequiredActionFunctionToolCall> toolCalls)
+        {
+            var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
+            threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
+
+            threadRun.Status = "requires_action";
+            threadRun.RequiredAction = new RequiredAction
+            {
+                Type = "submit_tool_outputs",
+                SubmitToolOutputs = new SubmitToolOutputs { ToolCalls = toolCalls.ToArray() }
+            };
+
+            var blobClient = _containerClient.GetBlobClient(runId);
+            await blobClient.UploadAsync(new BinaryData(threadRun), true);
+        }
+
+        private void ValidateToolOutputIds(ThreadRun? threadRun, RunSubmitToolOutputsParams runSubmitToolOutputsParams)
+        {
+            var toolCalls = threadRun?.RequiredAction?.SubmitToolOutputs?.ToolCalls ?? new RequiredActionFunctionToolCall[0] { };
+            var expectedIds = new HashSet<string>(toolCalls.Select(toolCall => toolCall?.Id ?? string.Empty));
+
+            var toolOutputs = runSubmitToolOutputsParams.ToolOutputs ?? new ToolOutput[0] { };
+            var submittedIds = new HashSet<string>(toolOutputs.Select(toolOutput => toolOutput?.ToolCallId ?? string.Empty));
+
+            foreach (var expectedId in expectedIds)
+            {
+                if (!submittedIds.Contains(expectedId))
+                {
+                    throw new Exception("missing expected id in tool outputs");
+                }
+            }
+            foreach (var submittedId in submittedIds)
+            {
+                if (!expectedIds.Contains(submittedId))
+                {
+                    throw new Exception("unexpected if in tool outpouts");
+                }
+            }
         }
     }
 }

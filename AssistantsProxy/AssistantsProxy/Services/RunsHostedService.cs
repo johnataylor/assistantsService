@@ -64,15 +64,14 @@ namespace AssistantsProxy.Services
 
             await _runsModel.SetStatus(workItem.RunId, "in_progress");
 
-            // Run the regular Chat Completion Functions loop
-
-            // check whether we are part way through a function?
+            // enqueued item for function output
+            // add in progress step for message creation
 
             var messageListResponse = await _messagesModel.ListAsync(workItem.ThreadId, null);
 
             var currentMessages = messageListResponse?.Data ?? throw new KeyNotFoundException($"messages for thread '{workItem.ThreadId}'");
 
-            var prompt = PromptFactory.Create(assistant, asssitantThread, run, currentMessages);
+            var prompt = PromptFactory.Create(assistant, asssitantThread, run, currentMessages, workItem.RunSubmitToolOutputsParams);
 
             var callResult = await _chatClient.CallAsync(prompt);
 
@@ -98,15 +97,9 @@ namespace AssistantsProxy.Services
             }
             else if (callResult is ToollCallResult toolCallResult)
             {
-                var runUpdateParams = new RunUpdateParams();
+                await _runsModel.SetRequiredAction(workItem.RunId, toolCallResult.ToolCalls);
 
-                // new ToollCallResult(new RequiredAction { SubmitToolOutputs = new SubmitToolOutputs { ToolCalls = toolCalls.ToArray() } });
-
-                // TODO can we actual use update for this - or do we need another 'internal' method?
-                await _runsModel.UpdateAsync(workItem.ThreadId, workItem.RunId, runUpdateParams, null);
-
-                // set status
-                // create step
+                // create step for tool
             }
 
             // END LOOP - logical "loop"
