@@ -39,57 +39,7 @@ namespace AssistantsProxy.Services
                     }
                     else
                     {
-                        var value = response.Value;
-
-                        // Load metadata
-
-                        var assistant = await _assistantsModel.RetrieveAsync(value.AssistantId, null) ?? throw new KeyNotFoundException(value.AssistantId);
-
-                        var asssitantThread = await _threadsModel.RetrieveAsync(value.ThreadId, null) ?? throw new KeyNotFoundException(value.ThreadId);
-
-                        var run = await _runsModel.RetrieveAsync(value.ThreadId, value.RunId, null) ?? throw new KeyNotFoundException(value.RunId);
-
-                        await _runsModel.SetStatus(value.RunId, "in_progress");
-
-                        // Run the regular Chat Completion Functions loop
-
-                        // BEGIN LOOP
-
-                        var messageListResponse = await _messagesModel.ListAsync(value.ThreadId, null);
-
-                        var currentMessages = messageListResponse?.Data ?? throw new KeyNotFoundException($"messages for thread '{value.ThreadId}'");
-
-                        var prompt = PromptFactory.Create(assistant, asssitantThread, run, currentMessages);
-
-                        var newMessage = await _chatClient.CallAsync(prompt);
-
-                        // TODO use MessageManager to manage the conversation history
-                        // var updatedMessages = MessageManager.Update(currentMessages, newMessage);
-                        // save updated messages
-
-                        // just for now, append the new message to the conversation
-
-                        var content = newMessage.Content?[0].Text?.Value ?? throw new Exception("expected some content");
-
-                        var messageCreateParams = new MessageCreateParams
-                        {
-                            Content = content,
-                            Role = newMessage.Role
-                        };
-
-                        var newThreadMessage = await _messagesModel.CreateAsync(value.ThreadId, messageCreateParams, null);
-
-                        var newThreadMessageId = newThreadMessage?.Id ?? throw new Exception("create new message failed");
-
-                        await _stepsModel.AddMessageCreationStepAsync(value.ThreadId, value.RunId, value.AssistantId, newThreadMessageId);
-
-                        // END LOOP
-
-                        // Update run status
-
-                        await _runsModel.SetStatus(value.RunId, "completed");
-
-                        // TODO...
+                        await ProcessWorkItem(response.Value);
 
                         await response.AcknowledgeAsync();
                     }
@@ -101,6 +51,65 @@ namespace AssistantsProxy.Services
                     var msg = e.Message;
                 }
             }
+        }
+        private async Task ProcessWorkItem(RunsWorkItemValue workItem)
+        {
+            // Load metadata
+
+            var assistant = await _assistantsModel.RetrieveAsync(workItem.AssistantId, null) ?? throw new KeyNotFoundException(workItem.AssistantId);
+
+            var asssitantThread = await _threadsModel.RetrieveAsync(workItem.ThreadId, null) ?? throw new KeyNotFoundException(workItem.ThreadId);
+
+            var run = await _runsModel.RetrieveAsync(workItem.ThreadId, workItem.RunId, null) ?? throw new KeyNotFoundException(workItem.RunId);
+
+            await _runsModel.SetStatus(workItem.RunId, "in_progress");
+
+            // Run the regular Chat Completion Functions loop
+
+            // check whether we are part way through a function?
+
+            var messageListResponse = await _messagesModel.ListAsync(workItem.ThreadId, null);
+
+            var currentMessages = messageListResponse?.Data ?? throw new KeyNotFoundException($"messages for thread '{workItem.ThreadId}'");
+
+            var prompt = PromptFactory.Create(assistant, asssitantThread, run, currentMessages);
+
+            var callResult = await _chatClient.CallAsync(prompt);
+
+            if (callResult is MessageCallResult messageCallResult)
+            {
+                var messageCreateParams = new MessageCreateParams
+                {
+                    Content = messageCallResult.Content,
+                    Role = "assistant"
+                };
+
+                var newThreadMessage = await _messagesModel.CreateAsync(workItem.ThreadId, messageCreateParams, null);
+
+                // TODO use MessageManager to manage the conversation history
+                // var updatedMessages = MessageManager.Update(currentMessages, newMessage);
+                // save updated messages
+
+                var newThreadMessageId = newThreadMessage?.Id ?? throw new Exception("create new message failed");
+
+                await _stepsModel.AddMessageCreationStepAsync(workItem.ThreadId, workItem.RunId, workItem.AssistantId, newThreadMessageId);
+
+                await _runsModel.SetStatus(workItem.RunId, "completed");
+            }
+            else if (callResult is ToollCallResult toolCallResult)
+            {
+                var runUpdateParams = new RunUpdateParams();
+
+                // new ToollCallResult(new RequiredAction { SubmitToolOutputs = new SubmitToolOutputs { ToolCalls = toolCalls.ToArray() } });
+
+                // TODO can we actual use update for this - or do we need another 'internal' method?
+                await _runsModel.UpdateAsync(workItem.ThreadId, workItem.RunId, runUpdateParams, null);
+
+                // set status
+                // create step
+            }
+
+            // END LOOP - logical "loop"
         }
     }
 }

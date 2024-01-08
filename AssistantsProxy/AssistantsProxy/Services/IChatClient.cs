@@ -5,6 +5,6 @@ namespace AssistantsProxy.Services
 {
     public interface IChatClient
     {
-        public Task<ThreadMessage> CallAsync(ChatCompletionsOptions prompt);
+        public Task<CallResultBase> CallAsync(ChatCompletionsOptions prompt);
     }
 }

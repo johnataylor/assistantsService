@@ -15,7 +15,7 @@ namespace AssistantsProxy.Services
             _client = new OpenAIClient(openAIKey);
         }
 
-        public async Task<ThreadMessage> CallAsync(ChatCompletionsOptions chatCompletionsOptions)
+        public async Task<CallResultBase> CallAsync(ChatCompletionsOptions chatCompletionsOptions)
         {
             chatCompletionsOptions.DeploymentName = _deploymentOrModelName;
             var chatComplations = await _client.GetChatCompletionsAsync(chatCompletionsOptions);
@@ -25,24 +25,55 @@ namespace AssistantsProxy.Services
                 throw new Exception("error on call to GPT");
             }
 
-            var chatChoice = chatComplations.Value.Choices[0] ?? throw new Exception("what?! we have no choice!");
+            var chatChoice = chatComplations.Value.Choices[0] ?? throw new Exception("no choice!");
 
-            if (chatChoice.FinishReason == CompletionsFinishReason.FunctionCall)
+            if (chatChoice.FinishReason == CompletionsFinishReason.Stopped)
             {
-                // TODO implement Function handling
+                return new MessageCallResult(chatChoice.Message.Content);
+            }
+            else if (chatChoice.FinishReason == CompletionsFinishReason.ToolCalls)
+            {
+                var toolCalls = new List<RequiredActionFunctionToolCall>();
 
-                throw new NotImplementedException("FunctionCall not implemented");
+                foreach (var chatCompletionToolCall in chatChoice.Message.ToolCalls)
+                {
+                    if (chatCompletionToolCall is ChatCompletionsFunctionToolCall chatCompletionsFunctionToolCall)
+                    {
+                        var functionName = chatCompletionsFunctionToolCall.Name;
+                        var arguments = chatCompletionsFunctionToolCall.Arguments;
+
+                        var newToolCall = new RequiredActionFunctionToolCall
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Function = new RequiredActionFunctionToolCallFunction
+                            {
+                                Name = functionName,
+                                Arguments = arguments
+                            },
+                            Type = "function"
+                        };
+
+                        toolCalls.Add(newToolCall);
+                    }
+                }
+
+                return new ToollCallResult(toolCalls);
+            }
+            else if (chatChoice.FinishReason == CompletionsFinishReason.FunctionCall)
+            {
+                throw new Exception("FinishReason: function call is deprecated");
+            }
+            else if (chatChoice.FinishReason == CompletionsFinishReason.TokenLimitReached)
+            {
+                throw new Exception("FinishReason: token limit reached");
+            }
+            else if (chatChoice.FinishReason == CompletionsFinishReason.ContentFiltered)
+            {
+                throw new Exception("FinishReason: content filtered");
             }
             else
             {
-                return new ThreadMessage
-                {
-                    Content = new[]
-                    {
-                        new MessageContent { Text = new MessageContentText { Value = chatChoice.Message.Content } }
-                    },
-                    Role = "assistant"
-                };
+                throw new Exception("FinishReason: unrecognized");
             }
         }
     }
