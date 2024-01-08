@@ -92,6 +92,13 @@ namespace AssistantsProxy.Models.Implementation
             throw new NotImplementedException();
         }
 
+        internal Task DeleteMessages(string threadId)
+        {
+            var blobName = GetBlobName(threadId);
+
+            return _containerClient.DeleteBlobAsync(blobName);
+        }
+
         private string GetBlobName(string threadId) => $"{threadId}_messages";
     }
 }

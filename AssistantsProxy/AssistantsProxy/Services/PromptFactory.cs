@@ -21,6 +21,7 @@ namespace AssistantsProxy.Services
             }
 
             AddChatRequestMessages(options.Messages, currentMessages);
+            AddToolCallsAndOutputs(options.Messages, run, toolOutputs);
             AddChatRequestTools(options.Tools, tools);
 
             return options;
@@ -89,6 +90,34 @@ namespace AssistantsProxy.Services
                             }
                         }
                         break;
+                }
+            }
+        }
+
+        private static void AddToolCallsAndOutputs(IList<ChatRequestMessage> chatRequestMessages, ThreadRun run, RunSubmitToolOutputsParams? toolOutputs)
+        {
+            if (toolOutputs != null && toolOutputs.ToolOutputs != null)
+            {
+                if (run?.RequiredAction?.SubmitToolOutputs?.ToolCalls != null)
+                {
+                    var assistantMessage = new ChatRequestAssistantMessage(string.Empty);
+                    foreach (var toolCall in run.RequiredAction.SubmitToolOutputs.ToolCalls)
+                    {
+                        if (toolCall.Function != null && toolCall.Function.Name != null && toolCall.Function.Arguments != null)
+                        {
+                            assistantMessage.ToolCalls.Add(new ChatCompletionsFunctionToolCall(toolCall.Id, toolCall.Function.Name, toolCall.Function.Arguments));
+                        }
+                    }
+                    chatRequestMessages.Add(assistantMessage);
+
+                    foreach (var toolOutput in toolOutputs.ToolOutputs)
+                    {
+                        chatRequestMessages.Add(new ChatRequestToolMessage(toolOutput.Output, toolOutput.ToolCallId));
+                    }
+                }
+                else
+                {
+                    throw new Exception("inconsistent state - tool outputs missing corresponding required actions");
                 }
             }
         }

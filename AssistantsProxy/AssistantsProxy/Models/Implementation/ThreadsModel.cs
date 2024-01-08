@@ -49,9 +49,10 @@ namespace AssistantsProxy.Models.Implementation
             return newThread;
         }
 
-        public Task DeleteAsync(string threadId, string? bearerToken)
+        public async Task DeleteAsync(string threadId, string? bearerToken)
         {
-            return _containerClient.DeleteBlobAsync(threadId);
+            await _messagesModel.DeleteMessages(threadId);
+            await _containerClient.DeleteBlobAsync(threadId);
         }
 
         public Task<AssistantThread?> RetrieveAsync(string threadId, string? bearerToken)

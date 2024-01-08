@@ -57,7 +57,7 @@ namespace AssistantsProxy.Services
                     }
                 }
 
-                return new ToollCallResult(toolCalls);
+                return new ToolCallResult(toolCalls);
             }
             else if (chatChoice.FinishReason == CompletionsFinishReason.FunctionCall)
             {

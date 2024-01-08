@@ -2,9 +2,9 @@
 
 namespace AssistantsProxy.Services
 {
-    public class ToollCallResult : CallResultBase
+    public class ToolCallResult : CallResultBase
     {
-        public ToollCallResult(IList<RequiredActionFunctionToolCall> toolCalls)
+        public ToolCallResult(IList<RequiredActionFunctionToolCall> toolCalls)
         {
             ToolCalls = toolCalls;
         }

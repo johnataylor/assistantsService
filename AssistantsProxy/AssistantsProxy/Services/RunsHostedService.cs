@@ -95,7 +95,7 @@ namespace AssistantsProxy.Services
 
                 await _runsModel.SetStatus(workItem.RunId, "completed");
             }
-            else if (callResult is ToollCallResult toolCallResult)
+            else if (callResult is ToolCallResult toolCallResult)
             {
                 await _runsModel.SetRequiredAction(workItem.RunId, toolCallResult.ToolCalls);
 
