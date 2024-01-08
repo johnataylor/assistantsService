@@ -43,9 +43,16 @@ namespace AssistantsProxy
             try
             {
                 var blobClient = containerClient.GetBlobClient(blobName);
-                var download = await blobClient.DownloadContentAsync();
-                var json = Encoding.UTF8.GetString(download.Value.Content);
-                return JsonSerializer.Deserialize<T>(json);
+                if (await blobClient.ExistsAsync())
+                {
+                    var download = await blobClient.DownloadContentAsync();
+                    var json = Encoding.UTF8.GetString(download.Value.Content);
+                    return JsonSerializer.Deserialize<T>(json);
+                }
+                else
+                {
+                    return default;
+                }
             }
             catch (RequestFailedException)
             {

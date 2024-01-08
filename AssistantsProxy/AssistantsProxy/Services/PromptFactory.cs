@@ -1,5 +1,6 @@
 ﻿using AssistantsProxy.Schema;
 using Azure.AI.OpenAI;
+using System.Reflection;
 
 namespace AssistantsProxy.Services
 {
@@ -105,7 +106,15 @@ namespace AssistantsProxy.Services
                     {
                         if (toolCall.Function != null && toolCall.Function.Name != null && toolCall.Function.Arguments != null)
                         {
-                            assistantMessage.ToolCalls.Add(new ChatCompletionsFunctionToolCall(toolCall.Id, toolCall.Function.Name, toolCall.Function.Arguments));
+                            var toolCallObj = new ChatCompletionsFunctionToolCall(toolCall.Id, toolCall.Function.Name, toolCall.Function.Arguments);
+
+                            // this is a work around - the "type" property appears to be null if this constructor has been used (can this really be right!?)
+                            // OpenAI fails the call if the "type" property is null - it should be "function"
+                            toolCallObj.GetType().InvokeMember("Type",
+                                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.SetProperty,
+                                Type.DefaultBinder, toolCallObj, new object[] { "function" });
+
+                            assistantMessage.ToolCalls.Add(toolCallObj);
                         }
                     }
                     chatRequestMessages.Add(assistantMessage);

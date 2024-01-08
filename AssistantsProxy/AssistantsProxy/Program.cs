@@ -22,7 +22,7 @@ builder.Services.AddScoped<IRunsModel, RunsModel>();
 builder.Services.AddScoped<IStepsModel, StepsModel>();
 builder.Services.AddSingleton<IRunsWorkQueue<RunsWorkItemValue>, RunsWorkQueue>();
 builder.Services.AddSingleton<IChatClient, ChatClient>();
-//builder.Services.AddHostedService<RunsHostedService>();
+builder.Services.AddHostedService<RunsHostedService>();
 
 //builder.Services.AddScoped<IAssistantsModel, ProxyAssistantsModel>();
 //builder.Services.AddScoped<IThreadsModel, ProxyThreadsModel>();
