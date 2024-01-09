@@ -8,7 +8,7 @@ namespace AssistantsProxy.Services
     {
         // TODO: the contract here is a work in progress, for example, not all of the assistant and run structures are required to make the options
 
-        public static ChatCompletionsOptions Create(Assistant assistant, AssistantThread asssitantThread, ThreadRun run, ThreadMessage[] currentMessages, RunSubmitToolOutputsParams? toolOutputs)
+        public static ChatCompletionsOptions Create(Assistant assistant, ThreadRun run, ThreadMessage[] currentMessages, RunSubmitToolOutputsParams? toolOutputs)
         {
             var options = new ChatCompletionsOptions();
 

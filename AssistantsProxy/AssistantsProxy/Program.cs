@@ -1,8 +1,4 @@
-using AssistantsProxy.Models;
-using AssistantsProxy.Models.Implementation;
-using AssistantsProxy.Models.Proxy;
-using AssistantsProxy.Schema;
-using AssistantsProxy.Services;
+using AssistantsProxy;
 using Microsoft.AspNetCore.Diagnostics;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -14,21 +10,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // swap these implementations if you want a pass-through proxy to OpenAI
-
-builder.Services.AddScoped<IAssistantsModel, AssistantsModel>();
-builder.Services.AddScoped<IThreadsModel, ThreadsModel>();
-builder.Services.AddScoped<IMessagesModel, MessagesModel>();
-builder.Services.AddScoped<IRunsModel, RunsModel>();
-builder.Services.AddScoped<IStepsModel, StepsModel>();
-builder.Services.AddSingleton<IRunsWorkQueue<RunsWorkItemValue>, RunsWorkQueue>();
-builder.Services.AddSingleton<IChatClient, ChatClient>();
-builder.Services.AddHostedService<RunsHostedService>();
-
-//builder.Services.AddScoped<IAssistantsModel, ProxyAssistantsModel>();
-//builder.Services.AddScoped<IThreadsModel, ProxyThreadsModel>();
-//builder.Services.AddScoped<IMessagesModel, ProxyMessagesModel>();
-//builder.Services.AddScoped<IRunsModel, ProxyRunsModel>();
-//builder.Services.AddScoped<IStepsModel, ProxyStepsModel>();
+builder.Services.AddAssistantsRuntime();
+//builder.Services.AddAssistantsPassThroughProxy();
 
 builder.Services.AddSwaggerGen(c =>
 {

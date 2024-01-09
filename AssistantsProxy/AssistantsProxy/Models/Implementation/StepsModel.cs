@@ -62,6 +62,42 @@ namespace AssistantsProxy.Models.Implementation
             return AddStepAsync(threadId, runId, assistantId, "tool_calls", "in_progress", stepDetails);
         }
 
+        internal async Task UpdateFunctionToolCallsStepAsync(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams)
+        {
+            var blobName = GetBlobName(threadId, runId);
+            var blobClient = _containerClient.GetBlobClient(blobName);
+
+            if (await blobClient.ExistsAsync())
+            {
+
+                var runSteps = await BlobStorageHelpers.DownloadAsync<List<RunStep>>(_containerClient, blobName);
+                var toolCallStep = runSteps?.LastOrDefault();
+
+                if (toolCallStep != null && toolCallStep.StepDetails is ToolCallsStepDetails stepDetails)
+                {
+                    if (stepDetails.ToolCalls != null)
+                    {
+                        foreach (var stepDetail in stepDetails.ToolCalls)
+                        {
+                            if (stepDetail is FunctionToolCall functionToolCall)
+                            {
+                                var toolCallId = functionToolCall.Id;
+                                if (functionToolCall.Function != null)
+                                {
+                                    functionToolCall.Function.Output = runSubmitToolOutputsParams?.ToolOutputs?.FirstOrDefault(item => item.ToolCallId == toolCallId)?.Output;
+                                }
+                            }
+                        }
+
+                        toolCallStep.Status = "completed";
+                        toolCallStep.CompletedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+                        await blobClient.UploadAsync(new BinaryData(runSteps), true);
+                    }
+                }
+            }
+        }
+
         private async Task AddStepAsync(string threadId, string runId, string assistantId, string type, string status, StepDetailsBase stepDetails)
         {
             var newRunStep = new RunStep
@@ -76,6 +112,11 @@ namespace AssistantsProxy.Models.Implementation
                 Type = type,
                 Status = status
             };
+
+            if (status == "completed")
+            {
+                newRunStep.CompletedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            }
 
             var blobName = GetBlobName(threadId, runId);
             var blobClient = _containerClient.GetBlobClient(blobName);

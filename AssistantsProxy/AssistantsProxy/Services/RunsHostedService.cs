@@ -64,14 +64,16 @@ namespace AssistantsProxy.Services
 
             await _runsModel.SetStatus(workItem.RunId, "in_progress");
 
-            // enqueued item for function output
-            // add in progress step for message creation
-
             var messageListResponse = await _messagesModel.ListAsync(workItem.ThreadId, null);
 
             var currentMessages = messageListResponse?.Data ?? throw new KeyNotFoundException($"messages for thread '{workItem.ThreadId}'");
 
-            var prompt = PromptFactory.Create(assistant, asssitantThread, run, currentMessages, workItem.RunSubmitToolOutputsParams);
+            if (workItem.RunSubmitToolOutputsParams != null)
+            {
+                await _stepsModel.UpdateFunctionToolCallsStepAsync(workItem.ThreadId, workItem.RunId, workItem.RunSubmitToolOutputsParams);
+            }
+
+            var prompt = PromptFactory.Create(assistant, run, currentMessages, workItem.RunSubmitToolOutputsParams);
 
             var callResult = await _chatClient.CallAsync(prompt);
 
@@ -99,10 +101,15 @@ namespace AssistantsProxy.Services
             {
                 await _runsModel.SetRequiredAction(workItem.RunId, toolCallResult.ToolCalls);
 
-                // create step for tool
-            }
+                var stepToolCalls = toolCallResult.ToolCalls.Select(toolCall =>
+                    new FunctionToolCall
+                    {
+                        Id = toolCall.Id,
+                        Function = new FunctionToolCallFunction { Name = toolCall.Function?.Name, Arguments = toolCall.Function?.Arguments }
+                    });
 
-            // END LOOP - logical "loop"
+                await _stepsModel.AddFunctionToolCallsStepAsync(workItem.ThreadId, workItem.RunId, workItem.AssistantId, stepToolCalls.ToArray());
+            }
         }
     }
 }
