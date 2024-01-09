@@ -16,6 +16,7 @@ namespace AssistantsProxy.Services
 
         public RunsHostedService(IConfiguration configuration, IRunsWorkQueue<RunsWorkItemValue> queue, IChatClient chatClient)
         {
+            // TODO: this works for desktop testing, however resolving these dependencies should be tied to the queue dequeue
             _assistantsModel = new AssistantsModel(configuration);
             _threadsModel = new ThreadsModel(configuration);
             _messagesModel = new MessagesModel(configuration);
