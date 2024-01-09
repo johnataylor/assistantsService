@@ -19,5 +19,4 @@ Otherwise we have:
 - better error handling in the proxy implementation (it's basically test code)
 - better validation and therefore error messages on some of the calls
 - retrival and code_interpreter tools
-- code in the hosted service needs some TLC
 
