@@ -1,21 +1,23 @@
 # assistantsService
 Implementation of the OpenAI Assistants API.
 
-The idea here is to create an implementation of the OpenAI Assistants API that implements the stateful aspects of the service, running the regular functions loop against the OpenAI chat completion endpoint.
+The idea here is to create an implementation of the OpenAI Assistants API that implements the stateful aspects of the service, and just calling the stateless OpenAI chat completion endpoint.
 
 There is a basic pass-through "Proxy" style implementation of the protocol, just there to verify things. And then, using the same Controllers but swapping out the Models, an implementation that uses Azure blob storage for the state.
 
-So far we have the Assistant, Thread and Message models and part of the Run Model. You'll need a blob storage account with "assistants," "threads," "messages" and "run" containers added.
+An Azure Storage Queue is used to facilitate the asynchronous Run exection. Work items being queued when you create a Run and again if the client needs to Submit tool outputs.
 
-Most of the protocol is there, with the exception of:
-
+Almost all the protocol is there, certainly the "interesting" parts, with the exception of:
 - Metadata
-- MessageUpdateParams
-- RunUpdateParams
+- Some updates: MessageUpdateParams, RunUpdateParams
 - ThreadCreateAndRunParams
-- Tool subtypes
+- Paging on the collections
+- Last Error
 
 Otherwise we have:
-- pagination on the various "list" operations
-- some of the implementation of update
-- the most obvious gap is error handling: either go undetected or 500 is returned when they are 404
+- need to add ILogger to the models (note the Steps logging is implemented)
+- better error handling in the proxy implementation (it's basically test code)
+- better validation and therefore error messages on some of the calls
+- retrival and code_interpreter tools
+- code in the hosted service needs some TLC
+
