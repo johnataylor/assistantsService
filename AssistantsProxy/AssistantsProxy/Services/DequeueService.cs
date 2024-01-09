@@ -3,15 +3,13 @@
     public class DequeueService : BackgroundService
     {
         private readonly IRunsWorkQueue<RunsWorkItemValue> _queue;
+        private readonly IServiceProvider _serviceProvider;
 
-        public DequeueService(IServiceProvider services, IRunsWorkQueue<RunsWorkItemValue> queue)
+        public DequeueService(IServiceProvider serviceProvider, IRunsWorkQueue<RunsWorkItemValue> queue)
         {
-            Services = services;
+            _serviceProvider = serviceProvider;
             _queue = queue;
         }
-
-        public IServiceProvider Services { get; }
-
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -19,20 +17,19 @@
             {
                 try
                 {
-                    var response = await _queue.DequeueAsync();
+                    var queueResponse = await _queue.DequeueAsync();
 
-                    if (response.Value == null)
+                    if (queueResponse.Value == null)
                     {
                         await Task.Delay(1000, stoppingToken);
                     }
                     else
                     {
-                        using (var scope = Services.CreateScope())
+                        using (var scope = _serviceProvider.CreateScope())
                         {
                             var runExecutor = scope.ServiceProvider.GetRequiredService<IRunExecutor>();
-                            await runExecutor.ProcessWorkItemAsync(response.Value);
-
-                            await response.AcknowledgeAsync();
+                            await runExecutor.ProcessWorkItemAsync(queueResponse.Value);
+                            await queueResponse.AcknowledgeAsync();
                         }
                     }
                 }

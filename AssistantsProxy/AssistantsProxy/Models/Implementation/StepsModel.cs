@@ -3,7 +3,7 @@ using Azure.Storage.Blobs;
 
 namespace AssistantsProxy.Models.Implementation
 {
-    public class StepsModel : IStepsModel
+    public class StepsModel : IStepsModel, IStepsUpdate
     {
         private readonly BlobContainerClient _containerClient;
         private const string ContainerName = "steps";
@@ -43,7 +43,7 @@ namespace AssistantsProxy.Models.Implementation
             return runStep;
         }
 
-        internal Task AddMessageCreationStepAsync(string threadId, string runId, string assistantId, string messageId)
+        public Task AddMessageCreationStepAsync(string threadId, string runId, string assistantId, string messageId)
         {
             var stepDetails = new MessageCreationStepDetails
             {
@@ -52,7 +52,7 @@ namespace AssistantsProxy.Models.Implementation
 
             return AddStepAsync(threadId, runId, assistantId, "message_creation", "completed", stepDetails);
         }
-        internal Task AddFunctionToolCallsStepAsync(string threadId, string runId, string assistantId, FunctionToolCall[] toolCalls)
+        public Task AddFunctionToolCallsStepAsync(string threadId, string runId, string assistantId, FunctionToolCall[] toolCalls)
         {
             var stepDetails = new ToolCallsStepDetails
             {
@@ -62,7 +62,7 @@ namespace AssistantsProxy.Models.Implementation
             return AddStepAsync(threadId, runId, assistantId, "tool_calls", "in_progress", stepDetails);
         }
 
-        internal async Task UpdateFunctionToolCallsStepAsync(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams)
+        public async Task UpdateFunctionToolCallsStepAsync(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams)
         {
             var blobName = GetBlobName(threadId, runId);
             var blobClient = _containerClient.GetBlobClient(blobName);

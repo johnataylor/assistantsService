@@ -4,7 +4,7 @@ using Azure.Storage.Blobs;
 
 namespace AssistantsProxy.Models.Implementation
 {
-    public class RunsModel : IRunsModel
+    public class RunsModel : IRunsModel, IRunsUpdate
     {
         private readonly BlobContainerClient _containerClient;
         private readonly IRunsWorkQueue<RunsWorkItemValue> _queue;
@@ -75,19 +75,29 @@ namespace AssistantsProxy.Models.Implementation
 
             return threadRun;
         }
-
-        internal async Task SetStatus(string runId, string status)
+        public async Task SetCompletedAsync(string runId)
         {
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
 
-            threadRun.Status = status;
+            threadRun.Status = "completed";
+            threadRun.CompletedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            var blobClient = _containerClient.GetBlobClient(runId);
+            await blobClient.UploadAsync(new BinaryData(threadRun), true);
+        }
+        public async Task SetInProgressAsync(string runId)
+        {
+            var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
+            threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
+
+            threadRun.Status = "in_progress";
 
             var blobClient = _containerClient.GetBlobClient(runId);
             await blobClient.UploadAsync(new BinaryData(threadRun), true);
         }
 
-        internal async Task SetRequiredAction(string runId, IList<RequiredActionFunctionToolCall> toolCalls)
+        public async Task SetRequiresActionAsync(string runId, IList<RequiredActionFunctionToolCall> toolCalls)
         {
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));

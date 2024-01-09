@@ -11,14 +11,22 @@ namespace AssistantsProxy
         {
             // you need to create 5 Azure Blob Storage Containers and an Azure Storage Queue
             // then you'll need configuration for "OpenAIKey," "DeploymentOrModelName" and "BlobConnectionString"
+
+            // dependencies for the REST interface
             services.AddScoped<IAssistantsModel, AssistantsModel>();
             services.AddScoped<IThreadsModel, ThreadsModel>();
             services.AddScoped<IMessagesModel, MessagesModel>();
             services.AddScoped<IRunsModel, RunsModel>();
             services.AddScoped<IStepsModel, StepsModel>();
+
+            // dependencies for the asynchronous queued runtime
             services.AddSingleton<IRunsWorkQueue<RunsWorkItemValue>, RunsWorkQueue>();
             services.AddSingleton<IChatClient, ChatClient>();
-            services.AddHostedService<RunsHostedService>();
+            services.AddScoped<IStepsUpdate, StepsModel>();
+            services.AddScoped<IRunsUpdate, RunsModel>();
+            services.AddScoped<IRunExecutor, RunExecutor>();
+            services.AddHostedService<DequeueService>();
+
             return services;
         }
 
