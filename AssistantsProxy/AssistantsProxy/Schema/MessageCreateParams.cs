@@ -15,6 +15,6 @@ namespace AssistantsProxy.Schema
         public string[]? FileIds { get; set; } = new string[0];
 
         [JsonPropertyName("metadata")]
-        public string? Metadata { get; set; }
+        public Metadata? Metadata { get; set; }
     }
 }

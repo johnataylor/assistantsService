@@ -35,11 +35,17 @@ namespace AssistantsProxy.Services
         {
             // Load metadata
 
+            var run = await _runsModel.RetrieveAsync(workItem.ThreadId, workItem.RunId, null) ?? throw new KeyNotFoundException(workItem.RunId);
+
+            if (run.Status == "cancelled" || run.Status == "cancelling" || run.Status == "failed" || run.Status == "completed" || run.Status == "expired")
+            {
+                // this run is done, no need for any further work
+                return;
+            }
+
             var assistant = await _assistantsModel.RetrieveAsync(workItem.AssistantId, null) ?? throw new KeyNotFoundException(workItem.AssistantId);
 
             var asssitantThread = await _threadsModel.RetrieveAsync(workItem.ThreadId, null) ?? throw new KeyNotFoundException(workItem.ThreadId);
-
-            var run = await _runsModel.RetrieveAsync(workItem.ThreadId, workItem.RunId, null) ?? throw new KeyNotFoundException(workItem.RunId);
 
             await _runsUpdate.SetInProgressAsync(workItem.RunId);
 

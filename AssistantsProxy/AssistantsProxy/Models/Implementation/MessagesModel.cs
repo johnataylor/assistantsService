@@ -84,8 +84,10 @@ namespace AssistantsProxy.Models.Implementation
 
         public Task<ThreadMessage?> UpdateAsync(string threadId, string messageId, MessageUpdateParams messageUpdateParams, string? bearerToken)
         {
+            // the update only applies to Metadata, so there is little point in implementing this until we have that implemented
+
             // load
-            // update
+            // update the message in the list
             // save
             // return
 

@@ -53,9 +53,18 @@ namespace AssistantsProxy.Models.Implementation
         {
             throw new NotImplementedException();
         }
-        public Task<ThreadRun?> CancelAsync(string threadId, string runId, string? bearerToken)
+        public async Task<ThreadRun?> CancelAsync(string threadId, string runId, string? bearerToken)
         {
-            throw new NotImplementedException();
+            var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
+            threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
+
+            threadRun.Status = "cancelled";
+            threadRun.CancelledAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            var blobClient = _containerClient.GetBlobClient(runId);
+            await blobClient.UploadAsync(new BinaryData(threadRun), true);
+
+            return threadRun;
         }
         public async Task<ThreadRun?> SubmitToolsOutputs(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams, string? bearerToken)
         {
