@@ -8,15 +8,18 @@ There is a basic pass-through "Proxy" style implementation of the protocol, just
 An Azure Storage Queue is used to facilitate the asynchronous Run exection. Work items being queued when you create a Run and again if the client needs to Submit tool outputs.
 
 Almost all the protocol is there, certainly the "interesting" parts, with the exception of:
-- Metadata
-- Some updates: MessageUpdateParams, RunUpdateParams
-- ThreadCreateAndRunParams
+- Metadata and then the related implementation of updates: MessageUpdateParams, RunUpdateParams
+- Short cut method ThreadCreateAndRunParams
 - Paging on the collections
 - Last Error
+- Run Failed state
 
-Otherwise we have:
-- need to add ILogger to the models (note the Steps logging is implemented)
+Otherwise we have - roughly in priority order:
+- need to add ILogger to the models
+- better validation and therefore error messages on some of the REST calls - basically there is lots of 404 missing
+- the schema definition could be tighter - specifically there are nulls everywhere and that could be better
+- the use of constants in the code could be improved
+- the Swagger could be improved with descriptions and constraints on values for various string constants
 - better error handling in the proxy implementation (it's basically test code)
-- better validation and therefore error messages on some of the calls
 - retrival and code_interpreter tools
 
