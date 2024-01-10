@@ -12,6 +12,7 @@ namespace AssistantsProxy.Services
         private readonly IRunsUpdate _runsUpdate;
         private readonly IStepsUpdate _stepsUpdate;
         private readonly IChatClient _chatClient;
+        private readonly ILogger<RunExecutor> _logger;
 
         public RunExecutor(
             IAssistantsModel assistantsModel,
@@ -20,7 +21,8 @@ namespace AssistantsProxy.Services
             IRunsModel runsModel,
             IRunsUpdate runsUpdate,
             IStepsUpdate stepsModel,
-            IChatClient chatClient)
+            IChatClient chatClient,
+            ILogger<RunExecutor> logger)
         {
             _assistantsModel = assistantsModel;
             _threadsModel = threadsModel;
@@ -29,6 +31,7 @@ namespace AssistantsProxy.Services
             _runsUpdate = runsUpdate;
             _stepsUpdate = stepsModel;
             _chatClient = chatClient;
+            _logger = logger;
         }
 
         public async Task ProcessWorkItemAsync(RunsWorkItemValue workItem)
@@ -46,6 +49,8 @@ namespace AssistantsProxy.Services
             var assistant = await _assistantsModel.RetrieveAsync(workItem.AssistantId, null) ?? throw new KeyNotFoundException(workItem.AssistantId);
 
             var asssitantThread = await _threadsModel.RetrieveAsync(workItem.ThreadId, null) ?? throw new KeyNotFoundException(workItem.ThreadId);
+
+            _logger.LogInformation($"Running work item for {run.Id} {assistant.Id} {asssitantThread.Id}");
 
             await _runsUpdate.SetInProgressAsync(workItem.RunId);
 

@@ -1,20 +1,24 @@
 ﻿using AssistantsProxy.Schema;
 using Azure.Storage.Blobs;
+using Microsoft.Extensions.Logging;
 
 namespace AssistantsProxy.Models.Implementation
 {
     public class ThreadsModel : IThreadsModel
     {
         private readonly BlobContainerClient _containerClient;
+        private readonly IMessagesModel _messagesModel;
+        private readonly IMessagesDelete _messagesDelete;
+        private readonly ILogger<ThreadsModel> _logger;
         private const string ContainerName = "threads";
-        private readonly MessagesModel _messagesModel;
 
-        public ThreadsModel(IConfiguration configuration)
+        public ThreadsModel(IConfiguration configuration, IMessagesModel messagesModel, IMessagesDelete messagesDelete, ILogger<ThreadsModel> logger)
         {
             var connectionString = configuration["BlobConnectionString"] ?? throw new ArgumentException("you must configure a blob storage connection string");
             _containerClient = new BlobContainerClient(connectionString, ContainerName);
-
-            _messagesModel = new MessagesModel(configuration);
+            _messagesModel = messagesModel;
+            _messagesDelete = messagesDelete;
+            _logger = logger;
         }
 
         public Task<AssistantThread?> CreateAndRunAsync(ThreadCreateAndRunParams? threadCreateParams, string? bearerToken)
@@ -46,12 +50,14 @@ namespace AssistantsProxy.Models.Implementation
                 }
             }
 
+            _logger.LogInformation($"Create Thread {newThread.Id}");
+
             return newThread;
         }
 
         public async Task DeleteAsync(string threadId, string? bearerToken)
         {
-            await _messagesModel.DeleteMessages(threadId);
+            await _messagesDelete.DeleteMessages(threadId);
             await _containerClient.DeleteBlobAsync(threadId);
         }
 

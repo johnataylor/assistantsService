@@ -16,6 +16,7 @@ namespace AssistantsProxy
             services.AddScoped<IAssistantsModel, AssistantsModel>();
             services.AddScoped<IThreadsModel, ThreadsModel>();
             services.AddScoped<IMessagesModel, MessagesModel>();
+            services.AddScoped<IMessagesDelete, MessagesModel>();
             services.AddScoped<IRunsModel, RunsModel>();
             services.AddScoped<IStepsModel, StepsModel>();
 
