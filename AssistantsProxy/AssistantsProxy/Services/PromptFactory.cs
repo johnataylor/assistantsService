@@ -108,8 +108,9 @@ namespace AssistantsProxy.Services
                         {
                             var toolCallObj = new ChatCompletionsFunctionToolCall(toolCall.Id, toolCall.Function.Name, toolCall.Function.Arguments);
 
-                            // this is a work around - the "type" property appears to be null if this constructor has been used (can this really be right!?)
+                            // this is a work around - the "type" property appears to be null if this constructor has been used
                             // OpenAI fails the call if the "type" property is null - it should be "function"
+                            // there appears to be a fix in the works: https://github.com/Azure/azure-sdk-for-net/commit/fb422f67e1c3f8ed86304c3fc6e1f8df8a5e8dcd
                             toolCallObj.GetType().InvokeMember("Type",
                                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.SetProperty,
                                 Type.DefaultBinder, toolCallObj, new object[] { "function" });
