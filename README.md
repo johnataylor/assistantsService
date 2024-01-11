@@ -23,3 +23,28 @@ Otherwise we have - roughly in priority order:
 - better error handling in the proxy implementation (it's basically test code)
 - retrival and code_interpreter tools
 
+# Setup Instructions
+
+In Azure portal create 5 blob containers:
+- assistants
+- messages
+- runs
+- steps
+- threads
+
+And a single Azure Queue called "work"
+
+Then on config you need:
+- OpenAIKey - which you get from the OpenAI https://platform.openai.com/api-keys
+- BlobConnectionString - Access Keys in the Azure Portal
+
+(note I use "dotnet user-secrets" for local testing)
+  
+Then run the project - and you should see the Swagger page open
+
+I have been using various JavaScript node programs. For example https://github.com/johnataylor/assistants/blob/main/steps/functions.js though I'm sure you could do better.
+
+
+
+
+  
