@@ -15,7 +15,6 @@ Almost all the protocol is there, certainly the "interesting" parts, with the ex
 - Run Failed state
 
 Otherwise we have - roughly in priority order:
-- need to add ILogger to the models
 - better validation and therefore error messages on some of the REST calls - basically there is lots of 404 missing
 - the specifics of the factoring around the OpenAI call could be improved 
 - the schema definition could be tighter - specifically there are nulls everywhere and that could be better
