@@ -5,14 +5,14 @@ namespace AssistantsProxy.Schema
     public class Assistant
     {
         [JsonPropertyName("id")]
-        public string? Id { get; set; }
+        public required string Id { get; init; }
 
         // 'assistant'
         [JsonPropertyName("object")]
-        public string? Object { get; set; }
+        public required string Object { get; init; }
 
         [JsonPropertyName("created_at")]
-        public long? CreatedAt { get; set; }
+        public required long CreatedAt { get; init; }
 
         [JsonPropertyName("name")]
         public string? Name { get; set; }

@@ -18,16 +18,16 @@ namespace AssistantsProxy.Models.Implementation
         {
             var newAssistant = new Assistant
             {
-                Object = "assistant",
                 Id = $"asst_{Guid.NewGuid()}",
+                Object = "assistant",
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 Model = assistantCreateParams.Model,
                 Instructions = assistantCreateParams.Instructions,
                 Name = assistantCreateParams.Name,
                 Description = assistantCreateParams.Description,
                 Metadata = assistantCreateParams.Metadata,
                 Tools = assistantCreateParams.Tools,
-                FileIds = assistantCreateParams.FileIds,
-                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                FileIds = assistantCreateParams.FileIds
             };
 
             await _containerClient.UploadBlobAsync(newAssistant.Id, new BinaryData(newAssistant));

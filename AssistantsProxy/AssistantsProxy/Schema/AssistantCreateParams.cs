@@ -2,16 +2,16 @@
 
 namespace AssistantsProxy.Schema
 {
-    public class AssistantCreateParams
+    public class AssistantCreateParams(string model)
     {
         [JsonPropertyName("model")]
-        public string? Model { get; set; }
+        public required string Model { get; init; } = model;
 
         [JsonPropertyName("description")]
         public string? Description { get; set; }
 
         [JsonPropertyName("file_ids")]
-        public string[] FileIds { get; set; } = new string[0];
+        public string[] FileIds { get; init; } = new string[0];
 
         [JsonPropertyName("instructions")]
         public string? Instructions { get; set; }
@@ -23,6 +23,6 @@ namespace AssistantsProxy.Schema
         public string? Name { get; set; }
 
         [JsonPropertyName("tools")]
-        public AssistantToolsBase[] Tools { get; set; } = new AssistantToolsBase[0];
+        public AssistantToolsBase[] Tools { get; init; } = new AssistantToolsBase[0];
     }
 }
