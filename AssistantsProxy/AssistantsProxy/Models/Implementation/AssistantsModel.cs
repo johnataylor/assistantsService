@@ -6,12 +6,14 @@ namespace AssistantsProxy.Models.Implementation
     public class AssistantsModel : IAssistantsModel
     {
         private readonly BlobContainerClient _containerClient;
+        private readonly ILogger<AssistantsModel> _logger;
         private const string ContainerName = "assistants";
 
-        public AssistantsModel(IConfiguration configuration)
+        public AssistantsModel(IConfiguration configuration, ILogger<AssistantsModel> logger)
         {
             var connectionString = configuration["BlobConnectionString"] ?? throw new ArgumentException("you must configure a blob storage connection string");
             _containerClient = new BlobContainerClient(connectionString, ContainerName);
+            _logger = logger;
         }
 
         public async Task<Assistant?> CreateAsync(AssistantCreateParams assistantCreateParams, string? bearerToken)
@@ -31,6 +33,8 @@ namespace AssistantsProxy.Models.Implementation
             };
 
             await _containerClient.UploadBlobAsync(newAssistant.Id, new BinaryData(newAssistant));
+
+            _logger.LogInformation($"Create Assistant {newAssistant.Id}");
 
             return newAssistant;
         }

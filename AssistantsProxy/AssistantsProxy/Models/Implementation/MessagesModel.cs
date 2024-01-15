@@ -3,15 +3,17 @@ using Azure.Storage.Blobs;
 
 namespace AssistantsProxy.Models.Implementation
 {
-    public class MessagesModel : IMessagesModel
+    public class MessagesModel : IMessagesModel, IMessagesDelete
     {
         private readonly BlobContainerClient _containerClient;
+        private readonly ILogger<MessagesModel> _logger;
         private const string ContainerName = "messages";
 
-        public MessagesModel(IConfiguration configuration)
+        public MessagesModel(IConfiguration configuration, ILogger<MessagesModel> logger)
         {
             var connectionString = configuration["BlobConnectionString"] ?? throw new ArgumentException("you must configure a blob storage connection string");
             _containerClient = new BlobContainerClient(connectionString, ContainerName);
+            _logger = logger;
         }
 
         public async Task<ThreadMessage?> CreateAsync(string threadId, MessageCreateParams messageCreateParams, string? bearerToken)
@@ -49,6 +51,8 @@ namespace AssistantsProxy.Models.Implementation
             threadMessages.Insert(0, newThreadMessage);
 
             await blobClient.UploadAsync(new BinaryData(threadMessages), true);
+
+            _logger.LogInformation($"Create Message {newThreadMessage.Id}");
 
             return newThreadMessage;
         }
@@ -94,9 +98,11 @@ namespace AssistantsProxy.Models.Implementation
             throw new NotImplementedException();
         }
 
-        internal Task DeleteMessages(string threadId)
+        public Task DeleteMessages(string threadId)
         {
             var blobName = GetBlobName(threadId);
+
+            // TODO: check if exists
 
             return _containerClient.DeleteBlobAsync(blobName);
         }

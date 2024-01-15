@@ -8,15 +8,43 @@ There is a basic pass-through "Proxy" style implementation of the protocol, just
 An Azure Storage Queue is used to facilitate the asynchronous Run exection. Work items being queued when you create a Run and again if the client needs to Submit tool outputs.
 
 Almost all the protocol is there, certainly the "interesting" parts, with the exception of:
-- Metadata
-- Some updates: MessageUpdateParams, RunUpdateParams
-- ThreadCreateAndRunParams
+- Metadata and then the related implementation of updates: MessageUpdateParams, RunUpdateParams
+- Short cut method ThreadCreateAndRunParams
 - Paging on the collections
 - Last Error
+- Run Failed state
 
-Otherwise we have:
-- need to add ILogger to the models (note the Steps logging is implemented)
+Otherwise we have - roughly in priority order:
+- better validation and therefore error messages on some of the REST calls - basically there is lots of 404 missing
+- the specifics of the factoring around the OpenAI call could be improved 
+- the schema definition could be tighter - specifically there are nulls everywhere and that could be better
+- the use of constants in the code could be improved
+- the Swagger could be improved with descriptions and constraints on values for various string constants
 - better error handling in the proxy implementation (it's basically test code)
-- better validation and therefore error messages on some of the calls
 - retrival and code_interpreter tools
 
+# Setup Instructions
+
+In Azure portal create 5 blob containers:
+- assistants
+- messages
+- runs
+- steps
+- threads
+
+And a single Azure Queue called "work"
+
+Then on config you need:
+- OpenAIKey - which you get from the OpenAI https://platform.openai.com/api-keys
+- BlobConnectionString - Access Keys in the Azure Portal
+
+(note I use "dotnet user-secrets" for local testing)
+  
+Then run the project - and you should see the Swagger page open
+
+I have been using various JavaScript node programs. For example https://github.com/johnataylor/assistants/blob/main/steps/functions.js though I'm sure you could do better.
+
+
+
+
+  

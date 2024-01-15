@@ -8,14 +8,15 @@ namespace AssistantsProxy.Models.Implementation
     {
         private readonly BlobContainerClient _containerClient;
         private readonly IRunsWorkQueue<RunsWorkItemValue> _queue;
-
+        private readonly ILogger<RunsModel> _logger;
         private const string ContainerName = "runs";
 
-        public RunsModel(IConfiguration configuration, IRunsWorkQueue<RunsWorkItemValue> queue)
+        public RunsModel(IConfiguration configuration, IRunsWorkQueue<RunsWorkItemValue> queue, ILogger<RunsModel> logger)
         {
             var connectionString = configuration["BlobConnectionString"] ?? throw new ArgumentException("you must configure a blob storage connection string");
             _containerClient = new BlobContainerClient(connectionString, ContainerName);
             _queue = queue;
+            _logger = logger;
         }
 
         public async Task<ThreadRun?> CreateAsync(string threadId, RunCreateParams runCreateParams, string? bearerToken)
@@ -40,6 +41,8 @@ namespace AssistantsProxy.Models.Implementation
             await _containerClient.UploadBlobAsync(newThreadRun.Id, new BinaryData(newThreadRun));
 
             await _queue.EnqueueAsync(new RunsWorkItemValue(assistantId, threadId, newThreadRun.Id, null));
+
+            _logger.LogInformation($"Create Run {newThreadRun.Id}");
 
             return newThreadRun;
         }
