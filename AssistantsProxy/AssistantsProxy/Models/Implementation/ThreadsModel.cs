@@ -1,6 +1,5 @@
 ﻿using AssistantsProxy.Schema;
 using Azure.Storage.Blobs;
-using Microsoft.Extensions.Logging;
 
 namespace AssistantsProxy.Models.Implementation
 {

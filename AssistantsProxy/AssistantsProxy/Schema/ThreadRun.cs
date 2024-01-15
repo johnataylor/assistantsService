@@ -5,24 +5,24 @@ namespace AssistantsProxy.Schema
     public class ThreadRun
     {
         [JsonPropertyName("id")]
-        public string? Id { get; set; }
+        public required string Id { get; set; }
 
         // 'assistant.run'
         [JsonPropertyName("object")]
-        public string? Object { get; set; }
+        public required string Object { get; set; }
 
         [JsonPropertyName("created_at")]
-        public long? CreatedAt { get; set; }
+        public required long CreatedAt { get; set; }
 
         [JsonPropertyName("assistant_id")]
-        public string? AssistantId { get; set; }
+        public required string AssistantId { get; set; }
 
         [JsonPropertyName("thread_id")]
-        public string? ThreadId { get; set; }
+        public required string ThreadId { get; set; }
 
         // 'queued' | 'in_progress' | 'requires_action' | 'cancelling' | 'cancelled' | 'failed' | 'completed' | 'expired'
         [JsonPropertyName("status")]
-        public string? Status { get; set; }
+        public required string Status { get; set; }
 
         [JsonPropertyName("started_at")]
         public long? StartedAt { get; set; }

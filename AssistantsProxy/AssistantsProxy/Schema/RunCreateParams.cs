@@ -5,7 +5,7 @@ namespace AssistantsProxy.Schema
     public class RunCreateParams
     {
         [JsonPropertyName("assistant_id")]
-        public string? AssistantId { get; set; }
+        public required string AssistantId { get; set; }
 
         [JsonPropertyName("instructions")]
         public string? Instructions { get; set; }
