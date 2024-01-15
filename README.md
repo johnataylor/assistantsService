@@ -15,7 +15,8 @@ Almost all the protocol is there, certainly the "interesting" parts, with the ex
 - Run Failed state
 
 Otherwise we have - roughly in priority order:
-- better validation and therefore error messages on some of the REST calls - basically there is lots of 404 missing
+- use C# 'required' in schema to remove some of the null programming (this also gives better input validation - and at least the right http error code)
+- better validation and therefore error messages on some of the REST calls - basically there is lots of 400 and 404 missing
 - the specifics of the factoring around the OpenAI call could be improved 
 - the schema definition could be tighter - specifically there are nulls everywhere and that could be better
 - the use of constants in the code could be improved
