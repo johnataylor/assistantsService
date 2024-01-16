@@ -6,7 +6,7 @@ namespace AssistantsProxy.Schema
     {
         // 'user'
         [JsonPropertyName("role")]
-        public string? Role { get; set; }
+        public required string Role { get; init; }
 
         [JsonPropertyName("content")]
         public string? Content { get; set; }

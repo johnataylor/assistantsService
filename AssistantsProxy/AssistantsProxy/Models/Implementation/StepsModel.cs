@@ -24,6 +24,7 @@ namespace AssistantsProxy.Models.Implementation
 
             var assistantList = new AssistantList<RunStep>
             {
+                Object = "list",
                 Data = threadRunSteps.ToArray()
             };
 

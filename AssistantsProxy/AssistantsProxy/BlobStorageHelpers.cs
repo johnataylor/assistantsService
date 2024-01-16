@@ -31,7 +31,8 @@ namespace AssistantsProxy
             }
 
             var assistantList = new AssistantList<T>
-            {
+            {   
+                Object = "list",
                 Data = objs.ToArray()
             };
 

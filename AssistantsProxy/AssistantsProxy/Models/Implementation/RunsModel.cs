@@ -76,14 +76,12 @@ namespace AssistantsProxy.Models.Implementation
 
             ValidateToolOutputIds(threadRun, runSubmitToolOutputsParams);
 
-            var assistantId = threadRun?.AssistantId ?? throw new Exception("assistant id on run is null");
-
             threadRun.Status = "queued";
 
             var blobClient = _containerClient.GetBlobClient(runId);
             await blobClient.UploadAsync(new BinaryData(threadRun), true);
 
-            await _queue.EnqueueAsync(new RunsWorkItemValue(assistantId, threadId, runId, runSubmitToolOutputsParams));
+            await _queue.EnqueueAsync(new RunsWorkItemValue(threadRun.AssistantId, threadId, runId, runSubmitToolOutputsParams));
 
             return threadRun;
         }

@@ -4,11 +4,14 @@ namespace AssistantsProxy.Schema
 {
     public class AssistantList<T>
     {
+        // 'list'
         [JsonPropertyName("object")]
-        public string? Object { get; set; }
+        public required string Object { get; init; }
 
         [JsonPropertyName("data")]
-        public T[]? Data { get; set; }
+        public required T[] Data { get; init; }
+
+        // TODO implement paging
 
         [JsonPropertyName("first_id")]
         public string? FirstId { get; set; }

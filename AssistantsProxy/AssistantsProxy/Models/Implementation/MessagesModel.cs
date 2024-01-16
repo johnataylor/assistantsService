@@ -36,7 +36,8 @@ namespace AssistantsProxy.Models.Implementation
                     }
                 },
                 Role = messageCreateParams.Role,
-                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                ThreadId = threadId
             };
 
             var blobName = GetBlobName(threadId);
@@ -67,6 +68,7 @@ namespace AssistantsProxy.Models.Implementation
 
             var assistantList = new AssistantList<ThreadMessage>
             {
+                Object = "list",
                 Data = threadMessages.ToArray()
             };
 

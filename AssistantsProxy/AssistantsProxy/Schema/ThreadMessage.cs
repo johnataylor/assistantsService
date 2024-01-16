@@ -5,18 +5,21 @@ namespace AssistantsProxy.Schema
     public class ThreadMessage
     {
         [JsonPropertyName("id")]
-        public required string Id { get; set; }
+        public required string Id { get; init; }
 
         // 'thread.message'
         [JsonPropertyName("object")]
-        public required string Object { get; set; }
+        public required string Object { get; init; }
 
         [JsonPropertyName("created_at")]
-        public required long CreatedAt { get; set; }
+        public required long CreatedAt { get; init; }
+
+        [JsonPropertyName("thread_id")]
+        public required string ThreadId { get; init; }
 
         // 'user' | 'assistant'
         [JsonPropertyName("role")]
-        public string? Role { get; set; }
+        public required string Role { get; init; }
 
         [JsonPropertyName("content")]
         public MessageContent[]? Content { get; set; }
