@@ -36,7 +36,7 @@ namespace AssistantsProxy
             return ((int)response.StatusCode, responseContent);
         }
 
-        public static async Task<(int statusCode, string contentType, string content)> MakeGetRequest(string requestUri, string? openAiBeta, string? bearerToken)
+        public static async Task<(int statusCode, string content)> MakeGetRequest(string requestUri, string? openAiBeta, string? bearerToken)
         {
             var client = new HttpClient();
             var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
@@ -44,13 +44,12 @@ namespace AssistantsProxy
             request.Headers.Add("OpenAI-Beta", openAiBeta);
 
             var response = await client.SendAsync(request);
-            var responseContentType = response.Content.Headers.ContentType?.ToString() ?? string.Empty;
             var responseContent = await response.Content.ReadAsStringAsync();
 
-            return ((int)response.StatusCode, responseContentType, responseContent);
+            return ((int)response.StatusCode, responseContent);
         }
 
-        public static async Task<int> MakeDeleteRequest(string requestUri, string? openAiBeta, string? bearerToken)
+        public static async Task<(int statusCode, string content)> MakeDeleteRequest(string requestUri, string? openAiBeta, string? bearerToken)
         {
             var client = new HttpClient();
             var request = new HttpRequestMessage(HttpMethod.Delete, requestUri);
@@ -58,8 +57,9 @@ namespace AssistantsProxy
             request.Headers.Add("OpenAI-Beta", openAiBeta);
 
             var response = await client.SendAsync(request);
+            var responseContent = await response.Content.ReadAsStringAsync();
 
-            return (int)response.StatusCode;
+            return ((int)response.StatusCode, responseContent);
         }
     }
 }

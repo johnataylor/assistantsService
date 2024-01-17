@@ -9,11 +9,11 @@ namespace AssistantsProxy.Models.Proxy
         {
             var inboundContent = JsonSerializer.Serialize(assistantCreateParams);
 
-            var (status, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/assistants", inboundContent, Constants.OpenAIBeta, bearerToken);
+            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/assistants", inboundContent, Constants.OpenAIBeta, bearerToken);
 
-            if (status != 200)
+            if (statusCode != 200)
             {
-                throw new Exception(content);
+                throw new ErrorMessageException(statusCode, JsonSerializer.Deserialize<ErrorMessage>(content));
             }
 
             return JsonSerializer.Deserialize<Assistant>(content);
@@ -21,14 +21,24 @@ namespace AssistantsProxy.Models.Proxy
 
         public async Task<AssistantList<Assistant>?> ListAsync(string? bearerToken)
         {
-            var (_, __, content) = await HttpProxyHelpers.MakeGetRequest(Constants.BaseUri + "/v1/assistants", Constants.OpenAIBeta, bearerToken);
+            var (statusCode, content) = await HttpProxyHelpers.MakeGetRequest(Constants.BaseUri + "/v1/assistants", Constants.OpenAIBeta, bearerToken);
+
+            if (statusCode != 200)
+            {
+                throw new ErrorMessageException(statusCode, JsonSerializer.Deserialize<ErrorMessage>(content));
+            }
 
             return JsonSerializer.Deserialize<AssistantList<Assistant>>(content);
         }
 
         public async Task<Assistant?> RetrieveAsync(string assistantId, string? bearerToken)
         {
-            var (_, __, content) = await HttpProxyHelpers.MakeGetRequest(Constants.BaseUri + "/v1/assistants/" + assistantId, Constants.OpenAIBeta, bearerToken);
+            var (statusCode, content) = await HttpProxyHelpers.MakeGetRequest(Constants.BaseUri + "/v1/assistants/" + assistantId, Constants.OpenAIBeta, bearerToken);
+
+            if (statusCode != 200)
+            {
+                throw new ErrorMessageException(statusCode, JsonSerializer.Deserialize<ErrorMessage>(content));
+            }
 
             return JsonSerializer.Deserialize<Assistant>(content);
         }
@@ -37,14 +47,24 @@ namespace AssistantsProxy.Models.Proxy
         {
             var inboundContent = JsonSerializer.Serialize(assistantUpdateParams);
 
-            var (_, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/assistants" + assistantId, inboundContent, Constants.OpenAIBeta, bearerToken);
+            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/assistants" + assistantId, inboundContent, Constants.OpenAIBeta, bearerToken);
+
+            if (statusCode != 200)
+            {
+                throw new ErrorMessageException(statusCode, JsonSerializer.Deserialize<ErrorMessage>(content));
+            }
 
             return JsonSerializer.Deserialize<Assistant>(content);
         }
 
         public async Task DeleteAsync(string assistantId, string? bearerToken)
         {
-            var _ = await HttpProxyHelpers.MakeDeleteRequest(Constants.BaseUri + "/v1/assistants" + assistantId, Constants.OpenAIBeta, bearerToken);
+            var (statusCode, content) = await HttpProxyHelpers.MakeDeleteRequest(Constants.BaseUri + "/v1/assistants" + assistantId, Constants.OpenAIBeta, bearerToken);
+
+            if (statusCode != 200)
+            {
+                throw new ErrorMessageException(statusCode, JsonSerializer.Deserialize<ErrorMessage>(content));
+            }
         }
     }
 }

@@ -43,5 +43,9 @@ namespace AssistantsProxy.Controllers
         {
             return _model.DeleteAsync(threadId, BearerToken);
         }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Route("/error")]
+        public IActionResult HandleError() => ErrorMessage();
     }
 }

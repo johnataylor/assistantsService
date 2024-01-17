@@ -1,6 +1,5 @@
 ﻿using AssistantsProxy.Models;
 using AssistantsProxy.Schema;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AssistantsProxy.Controllers
@@ -47,10 +46,6 @@ namespace AssistantsProxy.Controllers
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [Route("/error")]
-        public IActionResult HandleError()
-        {
-            var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
-            return BadRequest(exceptionHandlerFeature.Error.Message);
-        }
+        public IActionResult HandleError() => ErrorMessage();
     }
 }

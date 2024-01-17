@@ -25,5 +25,9 @@ namespace AssistantsProxy.Controllers
         {
             return _model.ListAsync(threadId, runId, BearerToken);
         }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Route("/error")]
+        public IActionResult HandleError() => ErrorMessage();
     }
 }

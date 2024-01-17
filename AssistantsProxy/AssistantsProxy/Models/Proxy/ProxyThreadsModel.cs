@@ -9,7 +9,12 @@ namespace AssistantsProxy.Models.Proxy
         {
             var inboundContent = JsonSerializer.Serialize(threadCreateParams);
 
-            var (_, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/threads", inboundContent, Constants.OpenAIBeta, bearerToken);
+            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/threads", inboundContent, Constants.OpenAIBeta, bearerToken);
+
+            if (statusCode != 200)
+            {
+                throw new ErrorMessageException(statusCode, JsonSerializer.Deserialize<ErrorMessage>(content));
+            }
 
             return JsonSerializer.Deserialize<AssistantThread>(content);
         }
@@ -20,12 +25,22 @@ namespace AssistantsProxy.Models.Proxy
 
             var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/threads/runs", inboundContent, Constants.OpenAIBeta, bearerToken);
 
+            if (statusCode != 200)
+            {
+                throw new ErrorMessageException(statusCode, JsonSerializer.Deserialize<ErrorMessage>(content));
+            }
+
             return JsonSerializer.Deserialize<AssistantThread>(content);
         }
 
         public async Task<AssistantThread?> RetrieveAsync(string threadId, string? bearerToken)
         {
-            var (_, _, content) = await HttpProxyHelpers.MakeGetRequest(Constants.BaseUri + "/v1/threads/" + threadId, Constants.OpenAIBeta, bearerToken);
+            var (statusCode, content) = await HttpProxyHelpers.MakeGetRequest(Constants.BaseUri + "/v1/threads/" + threadId, Constants.OpenAIBeta, bearerToken);
+
+            if (statusCode != 200)
+            {
+                throw new ErrorMessageException(statusCode, JsonSerializer.Deserialize<ErrorMessage>(content));
+            }
 
             return JsonSerializer.Deserialize<AssistantThread>(content);
         }
@@ -36,12 +51,22 @@ namespace AssistantsProxy.Models.Proxy
 
             var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/threads/" + threadId, inboundContent, Constants.OpenAIBeta, bearerToken);
 
+            if (statusCode != 200)
+            {
+                throw new ErrorMessageException(statusCode, JsonSerializer.Deserialize<ErrorMessage>(content));
+            }
+
             return JsonSerializer.Deserialize<AssistantThread>(content);
         }
 
         public async Task DeleteAsync(string threadId, string? bearerToken)
         {
-            var statusCode = await HttpProxyHelpers.MakeDeleteRequest(Constants.BaseUri + "/v1/threads/" + threadId, Constants.OpenAIBeta, bearerToken);
+            var (statusCode, content) = await HttpProxyHelpers.MakeDeleteRequest(Constants.BaseUri + "/v1/threads/" + threadId, Constants.OpenAIBeta, bearerToken);
+
+            if (statusCode != 200)
+            {
+                throw new ErrorMessageException(statusCode, JsonSerializer.Deserialize<ErrorMessage>(content));
+            }
         }
     }
 }
