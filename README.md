@@ -26,6 +26,11 @@ Otherwise we have - roughly in priority order:
 
 # Setup Instructions
 
+There are two independent implementations. One implements Assistants against Blob Storage the other simply proxies all the calls to OpenAI.
+You can pick which implementtation you want to test with by editing the DI in Program.cs, hopefully its self-explanatory.
+
+Regarding the implementation against Blob Storage.
+
 In Azure portal create 5 blob containers:
 - assistants
 - messages
