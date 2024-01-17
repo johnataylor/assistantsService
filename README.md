@@ -17,11 +17,11 @@ Almost all the protocol is there, certainly the "interesting" parts, with the ex
 Otherwise we have - roughly in priority order:
 - use C# 'required' in schema to remove some of the null programming (this also gives better input validation - and at least the right http error code)
 - better validation and therefore error messages on some of the REST calls - basically there is lots of 400 and 404 missing
+- work out how to mimic OpenAI errors when using C# 'required' on protocol classes 
 - the specifics of the factoring around the OpenAI call could be improved 
 - the schema definition could be tighter - specifically there are nulls everywhere and that could be better
 - the use of constants in the code could be improved
 - the Swagger could be improved with descriptions and constraints on values for various string constants
-- better error handling in the proxy implementation (it's basically test code)
 - retrival and code_interpreter tools
 
 # Setup Instructions
