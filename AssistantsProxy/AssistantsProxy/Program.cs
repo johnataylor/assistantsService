@@ -1,17 +1,24 @@
 using AssistantsProxy;
-using Microsoft.AspNetCore.Diagnostics;
 using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.Services.AddControllers()
+//    .ConfigureApiBehaviorOptions(options =>
+//    {
+//        //options.SuppressModelStateInvalidFilter = true;
+//        options.InvalidModelStateResponseFactory = context => new BadRequestResult();
+//    });
+
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // swap these implementations if you want a pass-through proxy to OpenAI
-builder.Services.AddAssistantsRuntime();
-//builder.Services.AddAssistantsPassThroughProxy();
+//builder.Services.AddAssistantsRuntime();
+builder.Services.AddAssistantsPassThroughProxy();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -27,31 +34,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseExceptionHandler(exceptionHandlerApp =>
-{
-    exceptionHandlerApp.Run(async context =>
-    {
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+app.UseExceptionHandler("/error");
 
-        // using static System.Net.Mime.MediaTypeNames;
-        context.Response.ContentType = Text.Plain;
+//app.UseExceptionHandler(exceptionHandlerApp =>
+//{
+//    exceptionHandlerApp.Run(async context =>
+//    {
+//        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-        await context.Response.WriteAsync("An exception was thrown.");
+//        // using static System.Net.Mime.MediaTypeNames;
+//        context.Response.ContentType = Text.Plain;
 
-        var exceptionHandlerPathFeature =
-            context.Features.Get<IExceptionHandlerPathFeature>();
-
-        if (exceptionHandlerPathFeature?.Error is FileNotFoundException)
-        {
-            await context.Response.WriteAsync(" The file was not found.");
-        }
-
-        if (exceptionHandlerPathFeature?.Path == "/")
-        {
-            await context.Response.WriteAsync(" Page: Home.");
-        }
-    });
-});
+//        await context.Response.WriteAsync("An exception was thrown.");
+//    });
+//});
 
 app.UseAuthorization();
 

@@ -1,5 +1,6 @@
 ﻿using AssistantsProxy.Models;
 using AssistantsProxy.Schema;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AssistantsProxy.Controllers
@@ -42,6 +43,14 @@ namespace AssistantsProxy.Controllers
         public Task DeleteAsync(string assistantId)
         {
             return _model.DeleteAsync(assistantId, BearerToken);
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Route("/error")]
+        public IActionResult HandleError()
+        {
+            var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
+            return BadRequest(exceptionHandlerFeature.Error.Message);
         }
     }
 }

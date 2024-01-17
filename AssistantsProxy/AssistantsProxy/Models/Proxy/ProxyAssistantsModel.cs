@@ -9,7 +9,12 @@ namespace AssistantsProxy.Models.Proxy
         {
             var inboundContent = JsonSerializer.Serialize(assistantCreateParams);
 
-            var (_, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/assistants", inboundContent, Constants.OpenAIBeta, bearerToken);
+            var (status, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/assistants", inboundContent, Constants.OpenAIBeta, bearerToken);
+
+            if (status != 200)
+            {
+                throw new Exception(content);
+            }
 
             return JsonSerializer.Deserialize<Assistant>(content);
         }

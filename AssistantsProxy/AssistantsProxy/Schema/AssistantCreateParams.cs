@@ -5,7 +5,7 @@ namespace AssistantsProxy.Schema
     public class AssistantCreateParams
     {
         [JsonPropertyName("model")]
-        public required string Model { get; init; }
+        public string? Model { get; init; }
 
         [JsonPropertyName("description")]
         public string? Description { get; set; }
