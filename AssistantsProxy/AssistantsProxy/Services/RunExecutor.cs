@@ -89,6 +89,20 @@ namespace AssistantsProxy.Services
             }
             else if (callResult is ToolCallResult toolCallResult)
             {
+                // TODO separate server tool calls from client tool calls (TODO server tools are not yet implemented)
+
+                // server tool calls should be queued up for local execution - using their own queue - with the results coming in through the work queue
+                // client tool call results intrinsically come in through the work queue from the runs model
+
+                // some complexity arises if this list of tools is hetergeneous as the assumption is that all the 'parallel" tool results are collected
+                // together for the next call to the LLM. OpenAI place this restriction that the client tool call results should arrive together but
+                // we have to do extra work to coordinate those results with the server tool call results
+
+                // the algorithm is to accumulate tool call results until all the results are in, and then and only then should we add an item to the
+                // work queue so perhaps it would be better to do this work in the Runs model than here
+
+                // basically treat external and internal tools pretty much the same way, and have the wait-all always applied
+
                 await _runsUpdate.SetRequiresActionAsync(workItem.RunId, toolCallResult.ToolCalls);
 
                 var stepToolCalls = toolCallResult.ToolCalls.Select(toolCall =>

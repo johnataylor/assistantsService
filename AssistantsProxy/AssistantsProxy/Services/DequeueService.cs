@@ -4,11 +4,13 @@
     {
         private readonly IRunsWorkQueue<RunsWorkItemValue> _queue;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<DequeueService> _logger;
 
-        public DequeueService(IServiceProvider serviceProvider, IRunsWorkQueue<RunsWorkItemValue> queue)
+        public DequeueService(IServiceProvider serviceProvider, IRunsWorkQueue<RunsWorkItemValue> queue, ILogger<DequeueService> logger)
         {
             _serviceProvider = serviceProvider;
             _queue = queue;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,9 +37,8 @@
                 }
                 catch (Exception e)
                 {
-                    // TODO logging
-
-                    var msg = e.Message;
+                    // TODO improve logging
+                    _logger.LogError(e.Message);
                 }
             }
         }
