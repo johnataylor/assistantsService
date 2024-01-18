@@ -1,6 +1,8 @@
-﻿using AssistantsProxy.Schema;
+﻿using AssistantsProxy.Hubs;
+using AssistantsProxy.Schema;
 using AssistantsProxy.Services;
 using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace AssistantsProxy.Models.Implementation
 {
@@ -8,14 +10,16 @@ namespace AssistantsProxy.Models.Implementation
     {
         private readonly BlobContainerClient _containerClient;
         private readonly IRunsWorkQueue<RunsWorkItemValue> _queue;
+        private readonly IHubContext<NotificationHub> _hubContext;
         private readonly ILogger<RunsModel> _logger;
         private const string ContainerName = "runs";
 
-        public RunsModel(IConfiguration configuration, IRunsWorkQueue<RunsWorkItemValue> queue, ILogger<RunsModel> logger)
+        public RunsModel(IConfiguration configuration, IRunsWorkQueue<RunsWorkItemValue> queue, IHubContext<NotificationHub> hubContext, ILogger<RunsModel> logger)
         {
             var connectionString = configuration["BlobConnectionString"] ?? throw new ArgumentException("you must configure a blob storage connection string");
             _containerClient = new BlobContainerClient(connectionString, ContainerName);
             _queue = queue;
+            _hubContext = hubContext;
             _logger = logger;
         }
 
@@ -95,6 +99,8 @@ namespace AssistantsProxy.Models.Implementation
 
             var blobClient = _containerClient.GetBlobClient(runId);
             await blobClient.UploadAsync(new BinaryData(threadRun), true);
+
+            await _hubContext.Clients.All.SendAsync("notification", new Notification { ThreadId = threadId, RunId = runId, Status = threadRun.Status });
         }
         public async Task SetInProgressAsync(string runId)
         {
@@ -121,6 +127,8 @@ namespace AssistantsProxy.Models.Implementation
 
             var blobClient = _containerClient.GetBlobClient(runId);
             await blobClient.UploadAsync(new BinaryData(threadRun), true);
+
+            await _hubContext.Clients.All.SendAsync("notification", new Notification { ThreadId = threadId, RunId = runId, Status = threadRun.Status });
         }
 
         private void ValidateToolOutputIds(ThreadRun? threadRun, RunSubmitToolOutputsParams runSubmitToolOutputsParams)
