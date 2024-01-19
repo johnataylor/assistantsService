@@ -44,7 +44,7 @@ namespace AssistantsProxy.Services
 
                         var newToolCall = new RequiredActionFunctionToolCall
                         {
-                            Id = Guid.NewGuid().ToString(),
+                            Id = $"call_{Guid.NewGuid()}",
                             Function = new RequiredActionFunctionToolCallFunction
                             {
                                 Name = functionName,
