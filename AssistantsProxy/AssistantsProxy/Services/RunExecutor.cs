@@ -1,6 +1,5 @@
 ﻿using AssistantsProxy.Models;
 using AssistantsProxy.Schema;
-using Microsoft.AspNetCore.SignalR;
 
 namespace AssistantsProxy.Services
 {
