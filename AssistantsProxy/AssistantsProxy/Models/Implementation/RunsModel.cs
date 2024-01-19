@@ -85,7 +85,7 @@ namespace AssistantsProxy.Models.Implementation
 
             return threadRun;
         }
-        public async Task SetCompletedAsync(string runId)
+        public async Task SetCompletedAsync(string threadId, string runId)
         {
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
@@ -107,7 +107,7 @@ namespace AssistantsProxy.Models.Implementation
             await blobClient.UploadAsync(new BinaryData(threadRun), true);
         }
 
-        public async Task SetRequiresActionAsync(string runId, IList<RequiredActionFunctionToolCall> toolCalls)
+        public async Task SetRequiresActionAsync(string threadId, string runId, IList<RequiredActionFunctionToolCall> toolCalls)
         {
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));

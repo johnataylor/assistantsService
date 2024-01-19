@@ -17,8 +17,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // swap these implementations if you want a pass-through proxy to OpenAI
-//builder.Services.AddAssistantsRuntime();
-builder.Services.AddAssistantsPassThroughProxy();
+builder.Services.AddAssistantsRuntime();
+//builder.Services.AddAssistantsPassThroughProxy();
 
 builder.Services.AddSwaggerGen(c =>
 {

@@ -47,7 +47,7 @@ namespace AssistantsProxy.Models.Proxy
         {
             var inboundContent = JsonSerializer.Serialize(assistantUpdateParams);
 
-            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/assistants" + assistantId, inboundContent, Constants.OpenAIBeta, bearerToken);
+            var (statusCode, content) = await HttpProxyHelpers.MakePostRequest(Constants.BaseUri + "/v1/assistants/" + assistantId, inboundContent, Constants.OpenAIBeta, bearerToken);
 
             if (statusCode != 200)
             {
@@ -59,7 +59,7 @@ namespace AssistantsProxy.Models.Proxy
 
         public async Task DeleteAsync(string assistantId, string? bearerToken)
         {
-            var (statusCode, content) = await HttpProxyHelpers.MakeDeleteRequest(Constants.BaseUri + "/v1/assistants" + assistantId, Constants.OpenAIBeta, bearerToken);
+            var (statusCode, content) = await HttpProxyHelpers.MakeDeleteRequest(Constants.BaseUri + "/v1/assistants/" + assistantId, Constants.OpenAIBeta, bearerToken);
 
             if (statusCode != 200)
             {
