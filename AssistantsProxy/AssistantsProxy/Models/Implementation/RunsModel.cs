@@ -7,11 +7,11 @@ namespace AssistantsProxy.Models.Implementation
     public class RunsModel : IRunsModel, IRunsUpdate
     {
         private readonly BlobContainerClient _containerClient;
-        private readonly IRunsWorkQueue<RunsWorkItemValue> _queue;
+        private readonly IWorkItemQueue<RunsWorkItemValue> _queue;
         private readonly ILogger<RunsModel> _logger;
         private const string ContainerName = "runs";
 
-        public RunsModel(IConfiguration configuration, IRunsWorkQueue<RunsWorkItemValue> queue, ILogger<RunsModel> logger)
+        public RunsModel(IConfiguration configuration, IWorkItemQueue<RunsWorkItemValue> queue, ILogger<RunsModel> logger)
         {
             var connectionString = configuration["BlobConnectionString"] ?? throw new ArgumentException("you must configure a blob storage connection string");
             _containerClient = new BlobContainerClient(connectionString, ContainerName);
@@ -109,6 +109,13 @@ namespace AssistantsProxy.Models.Implementation
 
         public async Task SetRequiresActionAsync(string threadId, string runId, IList<RequiredActionFunctionToolCall> toolCalls)
         {
+            // split the toolCalls between client tools and server tools
+
+            // client tools should be listed in the RequiredAction.SubmitToolOutputs - this will result in the client calling the corresponding function
+            // server tools should be each enqueued to the appropriate tool input queue - assuming the server tools are background tasks listening on queues
+
+            // results from queues can all be processed through the SubmitToolsOutputs method, and when all the expected results are in a work item should be enqueued  
+
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
 

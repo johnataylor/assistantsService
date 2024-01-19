@@ -21,12 +21,12 @@ namespace AssistantsProxy
             services.AddScoped<IStepsModel, StepsModel>();
 
             // dependencies for the asynchronous queued runtime
-            services.AddSingleton<IRunsWorkQueue<RunsWorkItemValue>, RunsWorkQueue>();
+            services.AddSingleton<IWorkItemQueue<RunsWorkItemValue>, RunsWorkQueue>();
             services.AddSingleton<IChatClient, ChatClient>();
             services.AddScoped<IStepsUpdate, StepsModel>();
             services.AddScoped<IRunsUpdate, RunsModel>();
-            services.AddScoped<IRunExecutor, RunExecutor>();
-            services.AddHostedService<DequeueService>();
+            services.AddScoped<IWorkItemExecutor<RunsWorkItemValue>, RunExecutor>();
+            services.AddHostedService<DequeueService<RunsWorkItemValue>>();
 
             return services;
         }

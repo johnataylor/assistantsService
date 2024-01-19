@@ -3,7 +3,7 @@ using AssistantsProxy.Schema;
 
 namespace AssistantsProxy.Services
 {
-    public class RunExecutor : IRunExecutor
+    public class RunExecutor : IWorkItemExecutor<RunsWorkItemValue>
     {
         private readonly IAssistantsModel _assistantsModel;
         private readonly IThreadsModel _threadsModel;

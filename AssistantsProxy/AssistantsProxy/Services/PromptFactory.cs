@@ -1,6 +1,7 @@
 ﻿using AssistantsProxy.Schema;
 using Azure.AI.OpenAI;
 using System.Reflection;
+using System.Text.Json.Nodes;
 
 namespace AssistantsProxy.Services
 {
@@ -51,9 +52,9 @@ namespace AssistantsProxy.Services
                     {
                         throw new NotImplementedException();
                     }
-                    else if (tool is AssistantToolsRetrieval assistantToolsRetrieval)
+                    else if (tool is AssistantToolsRetrieval)
                     {
-                        throw new NotImplementedException();
+                        chatRequestFunctions.Add(ServerToolDefinitions.RetrievalToolDefintion);
                     }
                 }
             }

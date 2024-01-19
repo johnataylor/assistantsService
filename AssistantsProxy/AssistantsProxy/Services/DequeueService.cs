@@ -1,12 +1,12 @@
 ﻿namespace AssistantsProxy.Services
 {
-    public class DequeueService : BackgroundService
+    public class DequeueService<T> : BackgroundService
     {
-        private readonly IRunsWorkQueue<RunsWorkItemValue> _queue;
+        private readonly IWorkItemQueue<T> _queue;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<DequeueService> _logger;
+        private readonly ILogger<DequeueService<T>> _logger;
 
-        public DequeueService(IServiceProvider serviceProvider, IRunsWorkQueue<RunsWorkItemValue> queue, ILogger<DequeueService> logger)
+        public DequeueService(IServiceProvider serviceProvider, IWorkItemQueue<T> queue, ILogger<DequeueService<T>> logger)
         {
             _serviceProvider = serviceProvider;
             _queue = queue;
@@ -29,7 +29,7 @@
                     {
                         using (var scope = _serviceProvider.CreateScope())
                         {
-                            var runExecutor = scope.ServiceProvider.GetRequiredService<IRunExecutor>();
+                            var runExecutor = scope.ServiceProvider.GetRequiredService<IWorkItemExecutor<T>>();
                             await runExecutor.ProcessWorkItemAsync(queueResponse.Value);
                             await queueResponse.AcknowledgeAsync();
                         }
