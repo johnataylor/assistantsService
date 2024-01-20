@@ -38,7 +38,13 @@ namespace AssistantsProxy.Services
         {
             // Load metadata
 
-            var run = await _runsModel.RetrieveAsync(workItem.ThreadId, workItem.RunId, null) ?? throw new KeyNotFoundException(workItem.RunId);
+            var run = await _runsModel.RetrieveAsync(workItem.ThreadId, workItem.RunId, null);
+
+            if (run == null)
+            {
+                _logger.LogWarning($"Running work item {workItem.ThreadId} {workItem.RunId} run == null");
+                return;
+            }
 
             if (run.Status == "cancelled" || run.Status == "cancelling" || run.Status == "failed" || run.Status == "completed" || run.Status == "expired")
             {
@@ -46,9 +52,21 @@ namespace AssistantsProxy.Services
                 return;
             }
 
-            var assistant = await _assistantsModel.RetrieveAsync(workItem.AssistantId, null) ?? throw new KeyNotFoundException(workItem.AssistantId);
+            var assistant = await _assistantsModel.RetrieveAsync(workItem.AssistantId, null);
 
-            var asssitantThread = await _threadsModel.RetrieveAsync(workItem.ThreadId, null) ?? throw new KeyNotFoundException(workItem.ThreadId);
+            if (assistant == null)
+            {
+                _logger.LogWarning($"Running work item {workItem.ThreadId} {workItem.RunId} assistant == null");
+                return;
+            }
+
+            var asssitantThread = await _threadsModel.RetrieveAsync(workItem.ThreadId, null);
+
+            if (asssitantThread == null)
+            {
+                _logger.LogWarning($"Running work item {workItem.ThreadId} {workItem.RunId} assistantThread == null");
+                return;
+            }
 
             _logger.LogInformation($"Running work item for {run.Id} {assistant.Id} {asssitantThread.Id}");
 
@@ -58,12 +76,12 @@ namespace AssistantsProxy.Services
 
             var currentMessages = messageListResponse?.Data ?? throw new KeyNotFoundException($"messages for thread '{workItem.ThreadId}'");
 
-            if (workItem.RunSubmitToolOutputsParams != null)
+            if (workItem.Rendezvous != null)
             {
-                await _stepsUpdate.UpdateFunctionToolCallsStepAsync(workItem.ThreadId, workItem.RunId, workItem.RunSubmitToolOutputsParams);
+                await _stepsUpdate.UpdateFunctionToolCallsStepAsync(workItem.ThreadId, workItem.RunId, workItem.Rendezvous);
             }
 
-            var prompt = PromptFactory.Create(assistant, run, currentMessages, workItem.RunSubmitToolOutputsParams);
+            var prompt = PromptFactory.Create(assistant, run, currentMessages, workItem.Rendezvous);
 
             var callResult = await _chatClient.CallAsync(prompt);
 

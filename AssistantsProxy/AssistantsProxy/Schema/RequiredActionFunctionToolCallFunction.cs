@@ -5,9 +5,9 @@ namespace AssistantsProxy.Schema
     public class RequiredActionFunctionToolCallFunction
     {
         [JsonPropertyName("name")]
-        public string? Name { get; set; }
+        public required string Name { get; set; }
 
         [JsonPropertyName("arguments")]
-        public string? Arguments { get; set; }
+        public required string Arguments { get; set; }
     }
 }

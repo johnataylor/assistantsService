@@ -8,14 +8,16 @@ namespace AssistantsProxy.Models.Implementation
     {
         private readonly BlobContainerClient _containerClient;
         private readonly IWorkItemQueue<RunsWorkItemValue> _queue;
+        private readonly IToolManager _toolManager;
         private readonly ILogger<RunsModel> _logger;
         private const string ContainerName = "runs";
 
-        public RunsModel(IConfiguration configuration, IWorkItemQueue<RunsWorkItemValue> queue, ILogger<RunsModel> logger)
+        public RunsModel(IConfiguration configuration, IWorkItemQueue<RunsWorkItemValue> queue, IToolManager toolManager, ILogger<RunsModel> logger)
         {
             var connectionString = configuration["BlobConnectionString"] ?? throw new ArgumentException("you must configure a blob storage connection string");
             _containerClient = new BlobContainerClient(connectionString, ContainerName);
             _queue = queue;
+            _toolManager = toolManager;
             _logger = logger;
         }
 
@@ -74,14 +76,24 @@ namespace AssistantsProxy.Models.Implementation
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
 
-            ValidateToolOutputIds(threadRun, runSubmitToolOutputsParams);
+            //ValidateToolOutputIds(threadRun, runSubmitToolOutputsParams);
 
-            threadRun.Status = "queued";
+            var rendezvous = await _toolManager.UpdateRendezvousAndCheckForCompletionAsync(threadId, runId, runSubmitToolOutputsParams);
+
+            if (rendezvous != null)
+            {
+                await _queue.EnqueueAsync(new RunsWorkItemValue(threadRun.AssistantId, threadId, runId, rendezvous));
+
+                await _toolManager.DeleteRendezvousAsync(threadId, runId);
+            }
+
+            threadRun.Status = "in_progress";
+            
+            // presumably the client should see null at this stage - however, we are also using this state to drive the backend
+            //threadRun.RequiredAction = null;
 
             var blobClient = _containerClient.GetBlobClient(runId);
             await blobClient.UploadAsync(new BinaryData(threadRun), true);
-
-            await _queue.EnqueueAsync(new RunsWorkItemValue(threadRun.AssistantId, threadId, runId, runSubmitToolOutputsParams));
 
             return threadRun;
         }
@@ -109,12 +121,12 @@ namespace AssistantsProxy.Models.Implementation
 
         public async Task SetRequiresActionAsync(string threadId, string runId, IList<RequiredActionFunctionToolCall> toolCalls)
         {
-            // split the toolCalls between client tools and server tools
+            var clientToolCalls = await _toolManager.CreateRendezvousAndEnqueueServerToolsAsync(threadId, runId, toolCalls);
 
-            // client tools should be listed in the RequiredAction.SubmitToolOutputs - this will result in the client calling the corresponding function
-            // server tools should be each enqueued to the appropriate tool input queue - assuming the server tools are background tasks listening on queues
-
-            // results from queues can all be processed through the SubmitToolsOutputs method, and when all the expected results are in a work item should be enqueued  
+            if (!clientToolCalls.Any())
+            {
+                return;
+            }
 
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
@@ -123,7 +135,7 @@ namespace AssistantsProxy.Models.Implementation
             threadRun.RequiredAction = new RequiredAction
             {
                 Type = "submit_tool_outputs",
-                SubmitToolOutputs = new SubmitToolOutputs { ToolCalls = toolCalls.ToArray() }
+                SubmitToolOutputs = new SubmitToolOutputs { ToolCalls = clientToolCalls.ToArray() }
             };
 
             var blobClient = _containerClient.GetBlobClient(runId);

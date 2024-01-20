@@ -28,6 +28,14 @@ namespace AssistantsProxy
             services.AddScoped<IWorkItemExecutor<RunsWorkItemValue>, RunExecutor>();
             services.AddHostedService<DequeueService<RunsWorkItemValue>>();
 
+            // tool management
+            services.AddScoped<IToolManager, ToolManager>();
+
+            // service for running retrieval
+            services.AddSingleton<IWorkItemQueue<RetrievalWorkItem>, RetrievalWorkQueue>();
+            services.AddScoped<IWorkItemExecutor<RetrievalWorkItem>, RetrievalExecutor>();
+            services.AddHostedService<DequeueService<RetrievalWorkItem>>();
+
             return services;
         }
 

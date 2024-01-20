@@ -63,7 +63,7 @@ namespace AssistantsProxy.Models.Implementation
             return AddStepAsync(threadId, runId, assistantId, "tool_calls", "in_progress", stepDetails);
         }
 
-        public async Task UpdateFunctionToolCallsStepAsync(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams)
+        public async Task UpdateFunctionToolCallsStepAsync(string threadId, string runId, Rendezvous rendezvous)
         {
             var blobName = GetBlobName(threadId, runId);
             var blobClient = _containerClient.GetBlobClient(blobName);
@@ -85,7 +85,7 @@ namespace AssistantsProxy.Models.Implementation
                                 var toolCallId = functionToolCall.Id;
                                 if (functionToolCall.Function != null)
                                 {
-                                    functionToolCall.Function.Output = runSubmitToolOutputsParams?.ToolOutputs?.FirstOrDefault(item => item.ToolCallId == toolCallId)?.Output;
+                                    functionToolCall.Function.Output = rendezvous.Items.FirstOrDefault(item => item.ToolCallId == toolCallId)?.Output;
                                 }
                             }
                         }

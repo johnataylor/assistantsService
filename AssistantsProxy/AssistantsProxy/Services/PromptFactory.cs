@@ -1,7 +1,7 @@
-﻿using AssistantsProxy.Schema;
+﻿using AssistantsProxy.Models;
+using AssistantsProxy.Schema;
 using Azure.AI.OpenAI;
 using System.Reflection;
-using System.Text.Json.Nodes;
 
 namespace AssistantsProxy.Services
 {
@@ -9,7 +9,7 @@ namespace AssistantsProxy.Services
     {
         // TODO: the contract here is a work in progress, for example, not all of the assistant and run structures are required to make the options
 
-        public static ChatCompletionsOptions Create(Assistant assistant, ThreadRun run, ThreadMessage[] currentMessages, RunSubmitToolOutputsParams? toolOutputs)
+        public static ChatCompletionsOptions Create(Assistant assistant, ThreadRun run, ThreadMessage[] currentMessages, Rendezvous? rendezvous)
         {
             var options = new ChatCompletionsOptions();
 
@@ -23,7 +23,7 @@ namespace AssistantsProxy.Services
             }
 
             AddChatRequestMessages(options.Messages, currentMessages);
-            AddToolCallsAndOutputs(options.Messages, run, toolOutputs);
+            AddToolCallsAndOutputs(options.Messages, run, rendezvous);
             AddChatRequestTools(options.Tools, tools);
 
             return options;
@@ -96,13 +96,17 @@ namespace AssistantsProxy.Services
             }
         }
 
-        private static void AddToolCallsAndOutputs(IList<ChatRequestMessage> chatRequestMessages, ThreadRun run, RunSubmitToolOutputsParams? toolOutputs)
+        private static void AddToolCallsAndOutputs(IList<ChatRequestMessage> chatRequestMessages, ThreadRun run, Rendezvous? rendezvous)
         {
-            if (toolOutputs != null && toolOutputs.ToolOutputs != null)
+            if (rendezvous != null && rendezvous.Items != null)
             {
+                // create a single assistant message including all the tools - both the client tools and the server tools
+
+                var assistantMessage = new ChatRequestAssistantMessage(string.Empty);
+
+                // client tools
                 if (run?.RequiredAction?.SubmitToolOutputs?.ToolCalls != null)
                 {
-                    var assistantMessage = new ChatRequestAssistantMessage(string.Empty);
                     foreach (var toolCall in run.RequiredAction.SubmitToolOutputs.ToolCalls)
                     {
                         if (toolCall.Function != null && toolCall.Function.Name != null && toolCall.Function.Arguments != null)
@@ -119,16 +123,33 @@ namespace AssistantsProxy.Services
                             assistantMessage.ToolCalls.Add(toolCallObj);
                         }
                     }
-                    chatRequestMessages.Add(assistantMessage);
+                }
 
-                    foreach (var toolOutput in toolOutputs.ToolOutputs)
+                // server tools
+                foreach (var rendezvousItem in rendezvous.Items)
+                {
+                    var function = rendezvousItem.ServerToolCallFunction;
+
+                    if (function != null && function.Name == "retrieval")
                     {
-                        chatRequestMessages.Add(new ChatRequestToolMessage(toolOutput.Output, toolOutput.ToolCallId));
+                        var toolCallObj = new ChatCompletionsFunctionToolCall(rendezvousItem.ToolCallId, function.Name, function.Arguments);
+
+                        // see comment above
+                        toolCallObj.GetType().InvokeMember("Type",
+                            BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.SetProperty,
+                            Type.DefaultBinder, toolCallObj, new object[] { "function" });
+
+                        assistantMessage.ToolCalls.Add(toolCallObj);
                     }
                 }
-                else
+
+                chatRequestMessages.Add(assistantMessage);
+
+                // and then for each tool call output we have, add a tool message
+
+                foreach (var rendezvousItem in rendezvous.Items)
                 {
-                    throw new Exception("inconsistent state - tool outputs missing corresponding required actions");
+                    chatRequestMessages.Add(new ChatRequestToolMessage(rendezvousItem.Output, rendezvousItem.ToolCallId));
                 }
             }
         }

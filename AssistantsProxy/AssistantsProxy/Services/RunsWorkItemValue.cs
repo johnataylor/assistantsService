@@ -1,4 +1,4 @@
-﻿using AssistantsProxy.Schema;
+﻿using AssistantsProxy.Models;
 using System.Text.Json.Serialization;
 
 namespace AssistantsProxy.Services
@@ -8,8 +8,8 @@ namespace AssistantsProxy.Services
         // note the constructor parameter names are significant in the deserilization execution
 
         [JsonConstructor]
-        public RunsWorkItemValue(string assistantId, string threadId, string runId, RunSubmitToolOutputsParams? runSubmitToolOutputsParams) =>
-            (AssistantId, ThreadId, RunId, RunSubmitToolOutputsParams) = (assistantId, threadId, runId, runSubmitToolOutputsParams);
+        public RunsWorkItemValue(string assistantId, string threadId, string runId, Rendezvous? rendezvous) =>
+            (AssistantId, ThreadId, RunId, Rendezvous) = (assistantId, threadId, runId, rendezvous);
 
         [JsonPropertyName("assistant_id")]
         public string AssistantId { get; }
@@ -21,6 +21,6 @@ namespace AssistantsProxy.Services
         public string RunId { get; }
 
         [JsonPropertyName("tool_outputs")]
-        public RunSubmitToolOutputsParams? RunSubmitToolOutputsParams { get; set; }
+        public Rendezvous? Rendezvous { get; set; }
     }
 }
