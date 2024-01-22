@@ -1,5 +1,5 @@
 using AssistantsProxy;
-using static System.Net.Mime.MediaTypeNames;
+using AssistantsProxy.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 //        //options.SuppressModelStateInvalidFilter = true;
 //        options.InvalidModelStateResponseFactory = context => new BadRequestResult();
 //    });
+
+builder.Services.AddSignalR();
 
 builder.Services.AddControllers();
 
@@ -52,5 +54,6 @@ app.UseExceptionHandler("/error");
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/notificationhub");
 
 app.Run();

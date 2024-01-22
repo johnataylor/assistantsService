@@ -14,7 +14,7 @@ namespace AssistantsProxy.Services
 
         public async Task ProcessWorkItemAsync(RetrievalWorkItem workItem)
         {
-            //await Task.Delay(3000);
+            await Task.Delay(3000);
 
             var submitToolOutputsParams = new RunSubmitToolOutputsParams
             {
