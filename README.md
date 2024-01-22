@@ -54,6 +54,8 @@ Then run the project - and you should see the Swagger page open
 
 I have been using various JavaScript node programs. For example https://github.com/johnataylor/assistants/blob/main/steps/functions.js though I'm sure you could do better.
 
+If you want to look at SignalR then switch the the signalr branch and the code in the signalr folder on the client repo (also on the signalr branch in that repo.)
+
 
 
 
