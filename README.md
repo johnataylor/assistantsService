@@ -1,5 +1,3 @@
-NOTE: currently SignalR code is on a branch called signalr and is not rebased on the latest code which includes the infratructure for asynchronous execution of server tools.
-
 # assistantsService
 Implementation of the OpenAI Assistants API.
 
@@ -8,6 +6,8 @@ The idea here is to create an implementation of the OpenAI Assistants API that i
 There is a basic pass-through "Proxy" style implementation of the protocol, just there to verify things. And then, using the same Controllers but swapping out the Models, an implementation that uses Azure blob storage for the state.
 
 An Azure Storage Queue is used to facilitate the asynchronous Run exection. Work items being queued when you create a Run and again if the client needs to Submit tool outputs.
+
+The runtime creates a SignalR Hub and notifies clients one run status change. This can be used to avoid polling.
 
 Almost all the protocol is there, certainly the "interesting" parts, with the exception of:
 - Metadata and then the related implementation of updates: MessageUpdateParams, RunUpdateParams
@@ -53,8 +53,6 @@ Then on config you need:
 Then run the project - and you should see the Swagger page open
 
 I have been using various JavaScript node programs. For example https://github.com/johnataylor/assistants/blob/main/steps/functions.js though I'm sure you could do better.
-
-If you want to look at SignalR then switch the the signalr branch and the code in the signalr folder on the client repo (also on the signalr branch in that repo.)
 
 
 
