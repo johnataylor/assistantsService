@@ -1,3 +1,5 @@
+NOTE: currently SignalR code is on a branch called signalr and is not rebased on the latest code which includes the infratructure for asynchronous execution of server tools.
+
 # assistantsService
 Implementation of the OpenAI Assistants API.
 
@@ -38,7 +40,9 @@ In Azure portal create 5 blob containers:
 - steps
 - threads
 
-And a single Azure Queue called "work"
+You need an Azure Queue called "work." It you want to play with the (currently fake) "retrieval" you also need a "retrival" queue.
+
+Currently Retrieval is not implemented as functionality, only the infrastructure which relies on queues. It always returns "Oslo" to what ever you ask.
 
 Then on config you need:
 - OpenAIKey - which you get from the OpenAI https://platform.openai.com/api-keys
