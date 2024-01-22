@@ -39,12 +39,13 @@ namespace AssistantsProxy.Services
                 {
                     if (chatCompletionToolCall is ChatCompletionsFunctionToolCall chatCompletionsFunctionToolCall)
                     {
+                        var toolCallId = chatCompletionToolCall.Id;
                         var functionName = chatCompletionsFunctionToolCall.Name;
                         var arguments = chatCompletionsFunctionToolCall.Arguments;
 
                         var newToolCall = new RequiredActionFunctionToolCall
                         {
-                            Id = $"call_{Guid.NewGuid()}",
+                            Id = toolCallId,
                             Function = new RequiredActionFunctionToolCallFunction
                             {
                                 Name = functionName,
