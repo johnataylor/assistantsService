@@ -17,6 +17,7 @@ Almost all the protocol is there, certainly the "interesting" parts, with the ex
 - Run Failed state
 
 Otherwise we have - roughly in priority order:
+- proper concurrency support on Rendezvous blob 
 - use C# 'required' in schema to remove some of the null programming (this also gives better input validation - and at least the right http error code)
 - better validation and therefore error messages on some of the REST calls - basically there is lots of 400 and 404 missing
 - work out how to mimic OpenAI errors when using C# 'required' on protocol classes 
