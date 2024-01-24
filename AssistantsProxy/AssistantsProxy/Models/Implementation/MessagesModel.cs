@@ -97,6 +97,8 @@ namespace AssistantsProxy.Models.Implementation
             // save
             // return
 
+            // TODO: and add appropriate eTag checks and retries for concurrency control
+
             throw new NotImplementedException();
         }
 
@@ -109,6 +111,6 @@ namespace AssistantsProxy.Models.Implementation
             return _containerClient.DeleteBlobAsync(blobName);
         }
 
-        private string GetBlobName(string threadId) => $"{threadId}_messages";
+        private static string GetBlobName(string threadId) => $"{threadId}_messages";
     }
 }

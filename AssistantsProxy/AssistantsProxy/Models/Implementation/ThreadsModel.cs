@@ -67,6 +67,8 @@ namespace AssistantsProxy.Models.Implementation
 
         public async Task<AssistantThread?> UpdateAsync(string threadId, ThreadUpdateParams threadUpdateParams, string? bearerToken)
         {
+            // TODO: add appropriate eTag checks and retries for concurrency control
+
             var assistantThread = await BlobStorageHelpers.DownloadAsync<AssistantThread>(_containerClient, threadId);
 
             if (assistantThread == null)

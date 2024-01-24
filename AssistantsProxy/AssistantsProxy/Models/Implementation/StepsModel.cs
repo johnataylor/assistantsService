@@ -133,6 +133,6 @@ namespace AssistantsProxy.Models.Implementation
             await blobClient.UploadAsync(new BinaryData(runSteps), true);
         }
 
-        private string GetBlobName(string threadId, string runId) => $"{threadId}_{runId}_steps";
+        private static string GetBlobName(string threadId, string runId) => $"{threadId}_{runId}_steps";
     }
 }

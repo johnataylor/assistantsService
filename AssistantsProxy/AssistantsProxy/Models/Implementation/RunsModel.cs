@@ -60,10 +60,14 @@ namespace AssistantsProxy.Models.Implementation
 
         public Task<ThreadRun?> UpdateAsync(string threadId, string runId, RunUpdateParams runUpdateParams, string? bearerToken)
         {
+            // TODO: and add appropriate eTag checks and retries for concurrency control
+
             throw new NotImplementedException();
         }
         public async Task<ThreadRun?> CancelAsync(string threadId, string runId, string? bearerToken)
         {
+            // TODO: add appropriate eTag checks and retries for concurrency control
+
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
 
@@ -77,8 +81,12 @@ namespace AssistantsProxy.Models.Implementation
         }
         public async Task<ThreadRun?> SubmitToolsOutputs(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams, string? bearerToken)
         {
+            // TODO: add appropriate eTag checks and retries for concurrency control
+
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
+
+            // possibly split this method for internal and external updates (they have different validation)
 
             //ValidateToolOutputIds(threadRun, runSubmitToolOutputsParams);
 
@@ -103,6 +111,8 @@ namespace AssistantsProxy.Models.Implementation
         }
         public async Task SetCompletedAsync(string threadId, string runId)
         {
+            // TODO: add appropriate eTag checks and retries for concurrency control
+
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
 
@@ -116,6 +126,8 @@ namespace AssistantsProxy.Models.Implementation
         }
         public async Task SetInProgressAsync(string runId)
         {
+            // TODO: add appropriate eTag checks and retries for concurrency control
+
             var threadRun = await BlobStorageHelpers.DownloadAsync<ThreadRun>(_containerClient, runId);
             threadRun = threadRun ?? throw new ArgumentNullException(nameof(threadRun));
 
@@ -127,6 +139,8 @@ namespace AssistantsProxy.Models.Implementation
 
         public async Task SetRequiresActionAsync(string threadId, string runId, IList<RequiredActionFunctionToolCall> toolCalls)
         {
+            // TODO: add appropriate eTag checks and retries for concurrency control
+
             var clientToolCalls = await _toolManager.CreateRendezvousAndEnqueueServerToolsAsync(threadId, runId, toolCalls);
 
             if (!clientToolCalls.Any())

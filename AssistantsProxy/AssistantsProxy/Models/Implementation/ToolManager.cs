@@ -76,6 +76,8 @@ namespace AssistantsProxy.Models.Implementation
 
         public async Task<Rendezvous?> UpdateRendezvousAndCheckForCompletionAsync(string threadId, string runId, RunSubmitToolOutputsParams runSubmitToolOutputsParams)
         {
+            // TODO: add appropriate eTag checks and retries for concurrency control
+
             var rendezvous = await BlobStorageHelpers.DownloadAsync<Rendezvous>(_containerClient, GetBlobName(runId));
 
             foreach (var toolOutput in runSubmitToolOutputsParams.ToolOutputs!)
@@ -98,6 +100,6 @@ namespace AssistantsProxy.Models.Implementation
             return rendezvous;
         }
 
-        private string GetBlobName(string runId) => $"{runId}_rendezvous";
+        private static string GetBlobName(string runId) => $"{runId}_rendezvous";
     }
 }
